@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/drawerGroupColor"
+    android:orientation="horizontal">
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivIcon"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:backgroundTint="@null"
+        android:layout_weight="10"
+        android:src="@drawable/icon_empty_portrait"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/listTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10dp"
+        android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
+        android:paddingTop="10dp"
+        android:textColor="@android:color/white"
+        android:textSize="30sp"
+        android:layout_weight="4"
+        tools:text="AAAAAAA"/>
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/ivGroupIndicator"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:backgroundTint="@null"
+        android:layout_weight="10"
+        android:src="@drawable/icon_arrow_drop_down"/>
+</androidx.appcompat.widget.LinearLayoutCompat>

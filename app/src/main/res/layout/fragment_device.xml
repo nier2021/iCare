@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.main.device.DeviceFragment">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="entity"
+            type="com.docter.icare.data.entities.view.DeviceEntity" />
+
+        <variable
+            name="click"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/iv_device_type"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#FF5BC3C4"
+                android:src="@drawable/icon_device_bedside_image" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_btn_device_scan"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <include
+                    android:id="@+id/layout_btn_device_bind"
+                    layout="@layout/layout_button_device"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="40dp"
+                    android:layout_marginBottom="20dp"
+                    app:btnBackground="@{@drawable/background_device_type}"
+                    app:btnIcon="@{entity.deviceName.length > 0 ? @drawable/icon_device_unbind : @drawable/icon_device_bind}"
+                    app:btnTitle="@{entity.deviceName.length > 0 ? @string/unbind_device : @string/device_setting}"
+                    app:click="@{click}"
+                    app:btnClickable="@{true}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/layout_device_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical"
+                android:paddingStart="20dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="10dp">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_device_name_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:text="@string/device_name"
+                        android:textColor="@color/black"
+                        android:textSize="24sp" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_device_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="4"
+                        android:text="@={entity.deviceName}"
+                        android:maxLines="1"
+                        android:padding="10dp"
+                        android:textColor="@color/black"
+                        android:textSize="24sp"
+                        tools:text="AAAAAAAAA" />
+                    <!--                    android:text="@={entity.deviceName}"-->
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/welcome_status_bar" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/layout_wifi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical"
+                android:paddingStart="20dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="10dp">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_wifi_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="7"
+                        android:text="@string/wifi_text"
+                        android:textColor="@color/black"
+                        android:textSize="24sp" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="5">
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/btn_wifi"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@{entity.isWifiBind ? @drawable/background_device_type : @drawable/background_button_grey}"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:gravity="center"
+                            android:onClick="@{click::onClick}"
+                            android:clickable="@{entity.isWifiBind}"
+                            android:text="@string/wifi_setting"
+                            android:textColor="@color/white"
+                            android:textSize="24sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+<!--                        android:background="@drawable/background_device_type"-->
+<!--                        <RadioGroup-->
+<!--                            android:id="@+id/switch_wifi_group"-->
+<!--                            style="@style/RadioSwitchGroupStyle"-->
+<!--                            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                            app:layout_constraintEnd_toEndOf="parent"-->
+<!--                            app:layout_constraintStart_toStartOf="parent"-->
+<!--                            app:layout_constraintTop_toTopOf="parent">-->
+
+<!--                            <com.google.android.material.radiobutton.MaterialRadioButton-->
+<!--                                android:id="@+id/btn_wifi_open"-->
+<!--                                style="@style/RadioSwitchButtonStyle"-->
+<!--                                android:text="@string/open_text"-->
+<!--                                android:textSize="22sp" />-->
+
+<!--                            <com.google.android.material.radiobutton.MaterialRadioButton-->
+<!--                                android:id="@+id/btn_wifi_close"-->
+<!--                                style="@style/RadioSwitchButtonStyle"-->
+<!--                                android:checked="true"-->
+<!--                                android:text="@string/close_text"-->
+<!--                                android:textSize="22sp" />-->
+
+<!--                        </RadioGroup>-->
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/welcome_status_bar" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/layout_wifi_account"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical"
+                android:paddingStart="20dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="10dp">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_wifi_account_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:text="@string/wifi_name"
+                        android:textColor="@color/black"
+                        android:textSize="24sp" />
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/et_wifi_account"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="4"
+                        android:background="@drawable/background_input_box_primary_stroke"
+                        android:gravity="center"
+                        android:hint="@string/wifi_name"
+                        android:inputType="text"
+                        android:digits="0123456789abcdefghigklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                        android:maxLines="1"
+                        android:padding="10dp"
+                        android:text="@={entity.wifiAccount}"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/grey"
+                        android:textSize="@dimen/textSizeMedium"
+                        tools:text="AAAAAAAAAAA" />
+                    <!--                    android:text="@={entity.wifiAccount}"-->
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/welcome_status_bar" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/layout_wifi_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical"
+                android:paddingStart="20dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="10dp">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_wifi_password_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="6"
+                        android:text="@string/wifi_password"
+                        android:textColor="@color/black"
+                        android:textSize="24sp" />
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/et_wifi_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="4"
+                        android:background="@drawable/background_input_box_primary_stroke"
+                        android:gravity="center"
+                        android:hint="@string/wifi_password"
+                        android:inputType="text"
+                        android:digits="0123456789abcdefghigklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                        android:maxLines="1"
+                        android:padding="10dp"
+                        android:text="@={entity.wifiPassword}"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/grey"
+                        android:textSize="@dimen/textSizeMedium"
+                        tools:text="AAAAAAAAAAA" />
+                    <!--                    android:text="@={entity.wifiPassword}"-->
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/welcome_status_bar" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+            <include
+                android:id="@+id/layout_btn_bed_type"
+                layout="@layout/layout_button_device"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="40dp"
+                android:layout_marginBottom="20dp"
+                app:btnBackground="@{entity.deviceName.length > 0 ? @drawable/background_device_type : @drawable/background_button_grey }"
+                app:btnIcon="@{@drawable/icon_bed_small}"
+                app:btnTitle="@{@string/set_bed_title}"
+                app:click="@{click}"
+                app:btnClickable="@{entity.deviceName.length > 0 ? true : false}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+<!--            app:btnBackground="@{@drawable/background_device_type}"-->
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/layout_bed_type_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="10dp">
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_bed_type_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="24sp"
+                android:visibility="@{entity.bedTypeName.length > 0 ? View.VISIBLE : View.GONE}"
+                android:text="@={entity.bedTypeName}"
+                tools:text="BBBBBBBBBBBBBBB"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="10dp"
+                android:visibility="@{entity.bedTypeName.length > 0 ? View.VISIBLE : View.GONE}"
+                android:background="@color/welcome_status_bar" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"/>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.core.widget.NestedScrollView>
+
+</layout>

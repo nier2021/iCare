@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:backgroundTint">@null</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="rippleColor">@color/hintColor</item>
+    </style>
+    <style name="AlertDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/alert_show</item>
+        <item name="android:windowExitAnimation">@anim/alert_dismiss</item>
+    </style>
+    <style name="TextViewStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:gravity">center</item>
+        <!--        <item name="autoSizeMaxTextSize">@dimen/textSizeMedium</item>-->
+        <!--        <item name="autoSizeMinTextSize">@dimen/textSizeXSmall</item>-->
+        <!--        <item name="autoSizeTextType">uniform</item>-->
+    </style>
+    <style name="TextViewStyle.ToolbarTitle" parent="TextViewStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="autoSizeMaxTextSize">30sp</item>
+        <item name="autoSizeMinTextSize">24sp</item>
+        <item name="autoSizeTextType">uniform</item>
+    </style>
+
+    <style name="RadioSwitchGroupStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/background_radio_switch_group</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+    <style name="RadioSwitchGroupStyle.White">
+        <item name="android:background">@drawable/background_radio_switch_group_white</item>
+    </style>
+
+    <style name="RadioSwitchButtonStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/background_radio_switch_selector</item>
+        <item name="android:button">@null</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:textColor">@color/selector_radio_switch_text_color</item>
+    </style>
+    <style name="RadioSwitchButtonStyle.White">
+        <item name="android:textColor">@color/selector_radio_switch_text_color_white</item>
+    </style>
+
+</resources>

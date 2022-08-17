@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.main.MainActivity">
+
+    <data>
+        <import type="com.docter.icare.data.entities.view.MainEntity" />
+
+        <import type="android.view.View" />
+
+        <variable
+            name="click"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="entity"
+            type="com.docter.icare.data.entities.view.MainEntity" />
+    </data>
+
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:openDrawer="start">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/toolbar_layout"
+                android:layout_width="0dp"
+                android:backgroundTint="@color/welcome_status_bar"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/fragment">
+
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:titleCentered="true"
+                    app:navigationIcon="@{entity.isDrawerBottomViewShow ? @drawable/icon_main_menu : @drawable/icon_back}"
+                    app:menu="@menu/bottom_nav_menu"/>
+<!--                app:navigationIcon="@{entity.nowFragment >-1 ? @drawable/icon_main_menu : @drawable/icon_back}"-->
+<!--                tools:navigationIcon="@drawable/icon_main_menu"-->
+            </com.google.android.material.appbar.AppBarLayout>
+<!--            <androidx.appcompat.widget.AppCompatTextView-->
+<!--                android:id="@+id/title"-->
+<!--                style="@style/TextViewStyle.ToolbarTitle"-->
+<!--                android:text="@{entity.title}"-->
+<!--                app:layout_constraintBottom_toBottomOf="@+id/toolbar_layout"-->
+<!--                app:layout_constraintEnd_toEndOf="@+id/toolbar_layout"-->
+<!--                app:layout_constraintStart_toStartOf="@+id/toolbar_layout"-->
+<!--                app:layout_constraintTop_toTopOf="@+id/toolbar_layout"-->
+<!--                tools:text="2022/01/01" />-->
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/fragment"
+                android:name="androidx.navigation.fragment.NavHostFragment"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:defaultNavHost="true"
+                app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar_layout"
+                app:navGraph="@navigation/main_navigation" />
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottomNavigation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="0dp"
+                android:layout_marginStart="0dp"
+                android:background="@color/bedsideMonitorBottomColor"
+                android:visibility="@{entity.isDrawerBottomViewShow ? View.VISIBLE : View.GONE}"
+                app:menu="@menu/bottom_nav_menu"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fragment"/>
+<!--            android:visibility="@{entity.nowFragment >-1  ? View.VISIBLE : View.GONE}"-->
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/drawer_menu"
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="@color/white"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/header"
+                layout="@layout/drawer_header"
+                app:userName="@{entity.name}" />
+            <include
+                android:id="@+id/person"
+                layout="@layout/drawer_person"
+                app:click="@{click}"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/white"/>
+
+            <ExpandableListView
+                android:id="@+id/expandableListView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:groupIndicator="@null"
+                android:dividerHeight="1dp"
+                android:childDivider="@color/grey"/>
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+
+</layout>

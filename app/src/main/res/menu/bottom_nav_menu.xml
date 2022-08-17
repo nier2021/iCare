@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/nav_bedside_monitor"
+        android:icon="@drawable/icon_bedside_monitor"
+        android:title="@string/bedside_monitor_text"/>
+    <item android:id="@+id/nav_air_quality_index"
+        android:icon="@drawable/icon_air_quality_index"
+        android:title="@string/air_quality"/>
+    <item android:id="@+id/nav_activity_monitoring"
+        android:icon="@drawable/icon_activity_monitoring"
+        android:title="@string/activity_monitoring"/>
+</menu>
