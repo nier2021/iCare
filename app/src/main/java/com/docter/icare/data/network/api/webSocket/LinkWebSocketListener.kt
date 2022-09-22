@@ -24,22 +24,22 @@ class LinkWebSocketListener(context: Context, accountId: String) : WebSocketList
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
         super.onOpen(webSocket, response)
-        Log.i("LinkWebSocketListener","onOpen webSocket=>$webSocket \n response=>$response")
+//        Log.i("LinkWebSocketListener","onOpen webSocket=>$webSocket \n response=>$response")
     }
 
     override fun onMessage(webSocket: WebSocket, text: String) {
         super.onMessage(webSocket, text)
-        Log.i("LinkWebSocketListener","onMessage 1 webSocket=>$webSocket \n text=>$text")
+//        Log.i("LinkWebSocketListener","onMessage 1 webSocket=>$webSocket \n text=>$text")
 
         if (linkFlag == -1 && text.isNotEmpty()){
             val getJsonData = WebSocketJson().pusherSubscribeJson(text)
-            Log.i("LinkWebSocketListener","onMessage getJsonData=>$getJsonData")
-            Log.i("LinkWebSocketListener","onMessage getJsonData event=>${getJsonData.event}")
-            Log.i("LinkWebSocketListener","onMessage getJsonData event=>${getJsonData.data}")
-            Log.i("LinkWebSocketListener","onMessage getJsonData data socket_id=>${getJsonData.data.socket_id}")
+//            Log.i("LinkWebSocketListener","onMessage getJsonData=>$getJsonData")
+//            Log.i("LinkWebSocketListener","onMessage getJsonData event=>${getJsonData.event}")
+//            Log.i("LinkWebSocketListener","onMessage getJsonData event=>${getJsonData.data}")
+//            Log.i("LinkWebSocketListener","onMessage getJsonData data socket_id=>${getJsonData.data.socket_id}")
             if (getJsonData.data.socket_id.isNotEmpty()){
 //                webSocket.send("{\"data\": { \"auth\": \"\",\"channel\": \"status-channel\" },\"event\": \"pusher:subscribe\"}")
-                Log.i("LinkWebSocketListener","onMessage pushId=>${pushId}")
+//                Log.i("LinkWebSocketListener","onMessage pushId=>${pushId}")
                     webSocket.send("{\"data\": {\"auth\": \"\",\"channel\": \"status-member-private-channel.$pushId\" },\"event\": \"pusher:subscribe\"}")
                     linkFlag = 1
 
@@ -53,7 +53,7 @@ class LinkWebSocketListener(context: Context, accountId: String) : WebSocketList
                 }
             }
         }else{
-            Log.i("LinkWebSocketListener","onMessage text2=>$text")
+//            Log.i("LinkWebSocketListener","onMessage text2=>$text")
             if (linkFlag == 1 && text.isNotEmpty()) {
                 WebSocketJson().sendResponse(text).run {
                     Log.i("LinkWebSocketListener","onMessage linkFlag == 1 event=>${this.event}")
@@ -70,11 +70,11 @@ class LinkWebSocketListener(context: Context, accountId: String) : WebSocketList
             }else{
                 if (linkFlag == 2 && text.isNotEmpty()) {
                     val getRadarJsonData = WebSocketJson().responseJson(text)
-                    Log.i("LinkWebSocketListener","onMessage getRadarJsonData=>$getRadarJsonData")
-                    Log.i("LinkWebSocketListener","onMessage getRadarJsonData event=>${getRadarJsonData.event}")
-                    Log.i("LinkWebSocketListener","onMessage getRadarJsonData event=>${getRadarJsonData.data}")
-                    Log.i("LinkWebSocketListener","onMessage getRadarJsonData data time=>${getRadarJsonData.data.time}")
-                    Log.i("LinkWebSocketListener","onMessage getRadarJsonData data breath_state=>${getRadarJsonData.data.status.breath_state}")
+//                    Log.i("LinkWebSocketListener","onMessage getRadarJsonData=>$getRadarJsonData")
+//                    Log.i("LinkWebSocketListener","onMessage getRadarJsonData event=>${getRadarJsonData.event}")
+//                    Log.i("LinkWebSocketListener","onMessage getRadarJsonData event=>${getRadarJsonData.data}")
+//                    Log.i("LinkWebSocketListener","onMessage getRadarJsonData data time=>${getRadarJsonData.data.time}")
+//                    Log.i("LinkWebSocketListener","onMessage getRadarJsonData data breath_state=>${getRadarJsonData.data.status.breath_state}")
                     Coroutines.io {
 //                        socketEventChannel.send(SocketUpdate(text = "breath_state=>$${getRadarJsonData.data.status.breath_state}"))
                         try {

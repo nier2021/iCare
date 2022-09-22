@@ -20,6 +20,7 @@ class RadarBleDataManager(context: Context) : BleConnectListener {
     //    private var bleBioradarDataListener: ((rawHexString: String, asciiString: String) -> Unit)? = null
     private var bleBioradarDataListener: ((radarData: RadarData) -> Unit)? = null
     private var bleBioradarDistanceListener: ((Int) -> Unit)? = null
+//    private var bleRadarDataListener: BleDataReceiveListener? = null
 
     companion object {
         private var instance : RadarBleDataManager? = null
@@ -82,19 +83,23 @@ class RadarBleDataManager(context: Context) : BleConnectListener {
     }
 
     fun writeValue(string: String) {
-        Log.i("RadarBleDataManager","writeValue")
+        Log.i("RadarBleDataManager","writeValue=>${string.toByteArray().toHexStringSpace()}")
         radarBleManager?.writeValue(string.toByteArray())
     }
 
     fun writeRegulateValue(regulateData: ByteArray) {
-        Log.i("RadarBleDataManager","writeRegulateValue")
+        Log.i("RadarBleDataManager","writeRegulateValue=>${regulateData.toHexStringSpace()}")
         radarBleManager?.writeValue(regulateData)
     }
 
+    var bleRadarDataListener: BleDataReceiveListener? = null
+
     private val dataReceiveListener = object : BleDataReceiveListener {
-        override fun onReceive(data: ByteArray) {
+        override fun onRadarData(data: ByteArray) {
+            super.onRadarData(data)
             Log.i("RadarBleDataManager","dataReceiveListener onReceive")
             parsePacket(data)
+            bleRadarDataListener?.onRadarData(data)
         }
     }
 
@@ -107,6 +112,7 @@ class RadarBleDataManager(context: Context) : BleConnectListener {
         //SERVER CONNECT FAIL server連接失敗
         //LOAD SERVER FAIL 登入後台連接失敗
         //OTHER FAIL 其他失敗
+
     }
 
     //以下可拿掉
@@ -138,8 +144,8 @@ class RadarBleDataManager(context: Context) : BleConnectListener {
 ////        } else {
 //            val radarData = RadarData(radarState, distance, bedState, breathState, heartRate, now)
 //        Log.i("RadarBleDataManager","radarData=>$radarData")
-//            this.bleBioradarDataListener?.invoke(radarData)
-//            this.bleBioradarDistanceListener?.invoke(receivePacket[5].toInt())
+//           this.bleBioradarDataListener?.invoke(radarData)
+//            this.bleBioradarDistanceListener?.invoke(receivePacket[5].t oInt())
 ////        }
 //
 ////        } else {
@@ -179,3 +185,34 @@ class RadarBleDataManager(context: Context) : BleConnectListener {
     }
 
 }
+
+//interface BleSettingReceiveCallback {
+//    fun onB10HRVReceive(data: ByteArray){}
+//    private fun parseB10HRVReceiveData(
+//        data: ByteArray
+//    ){
+//        Log.i("BleDataReceive","parseB10HRVReceiveData}")
+//        bleSettingReceiveCallback?.onB10HRVReceive(data)
+//    }
+//    fun getBleData() = fatigueRepository.getB10SynHRVData(bleSettingReceiveCallback)
+//    val bleSettingReceiveCallback = object : BleSettingReceiveCallback {
+//        override fun onB10HRVReceive(data: ByteArray) {
+//            super.onB10HRVReceive(data)
+////            Log.i("FatigueViewModel","onB10HRVReceive data=>$data")
+//            Log.i("FatigueViewModel","onB10HRVReceive data hex=>${data.toHexStringSpace()}")
+//            main{
+//                refreshData()
+//            }
+//        }
+//    }
+
+//  setBioradarDataListener
+//        setUpdateRadarData()
+//        RadarBleDataManager.getInstance(requireActivity())
+//            .setBioradarDataListener { radarData ->
+//                if (!isOnline) {
+//                    heartRateTextView.text = "${radarData.heartRate}"
+//                    breathFrequencyTextView.text = "${radarData.breathState}"
+//                    dataTimeTextView.text = "${radarData.createDate}"
+//                    bedStateTextView.text = if (radarData.bedState == "離床") getString(R.string.out_of_bed) else getString(R.string.on_bed)
+//                }

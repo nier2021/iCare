@@ -262,7 +262,7 @@ class RadarBleManager constructor(
             characteristic: BluetoothGattCharacteristic?
         ) {
             super.onCharacteristicChanged(gatt, characteristic)
-            bleDataReceiveListener?.onReceive(characteristic!!.value)
+            bleDataReceiveListener?.onRadarData(characteristic!!.value)
         }
     }
 

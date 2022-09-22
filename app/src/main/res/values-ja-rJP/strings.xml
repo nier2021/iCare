@@ -252,4 +252,5 @@
     <string name="error_wifi_password_empty">wifi密碼不能為空</string>
     <string name="error_wifi_length">wifi帳號或密碼只能小於20個字元(全中文不能超過7個字)</string>
     <string name="error_wifi_special_symbols">wifi帳號或密碼不能有特殊符號(ex:”或,等)</string>
+    <string name="error_login_acc_pass_incorrect">アカウントまたはパスワードが正しくありません</string>
 </resources>

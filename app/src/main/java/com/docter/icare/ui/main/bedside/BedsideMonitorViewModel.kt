@@ -29,8 +29,9 @@ class BedsideMonitorViewModel(
 
     fun socketData(context: Context, data: SocketUpdate) {
 //        if (data.bioRadar!!.radar_state == "正常") {
-            Log.i("BedsideMonitorViewModel","socketData")
-            Log.i("BedsideMonitorViewModel","bed_state=>${data.bioRadar!!.bed_state}")
+//            Log.i("BedsideMonitorViewModel","socketData")
+//            Log.i("BedsideMonitorViewModel","bed_state=>${data.bioRadar!!.bed_state}")
+            val a= data.bioRadar!!.bed_state
 //            if (data.bioRadar.distance.toDouble() > 0.1  && data.bioRadar.bed_state != "離床"){
             if (data.bioRadar.distance.toDouble() > 10 && data.bioRadar.bed_state != "離床"){
                 when (data.bioRadar.bed_state) {

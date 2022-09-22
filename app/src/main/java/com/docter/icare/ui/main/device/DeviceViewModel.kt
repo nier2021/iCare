@@ -9,6 +9,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.docter.icare.R
 import com.docter.icare.data.bleUtil.bleInterface.BleConnectListener
+import com.docter.icare.data.bleUtil.bleInterface.BleDataReceiveListener
+import com.docter.icare.data.bleUtil.device.radar.RadarBleManager
 import com.docter.icare.data.entities.view.AccountInfo
 import com.docter.icare.data.entities.view.DeviceEntity
 import com.docter.icare.data.entities.view.LoginEntity
@@ -17,6 +19,7 @@ import com.docter.icare.data.resource.RADAR_DEVICE_ACCOUNT_ID
 import com.docter.icare.data.resource.RADAR_DEVICE_MAC
 import com.docter.icare.data.resource.RADAR_DEVICE_NAME
 import com.docter.icare.utils.toBedName
+import com.docter.icare.utils.toHexStringSpace
 import io.reactivex.rxjava3.core.Observable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -34,6 +37,10 @@ class DeviceViewModel(
     val bedTypeChangeFlag: MutableLiveData<Boolean> = MutableLiveData(false)
     val bedType: MutableLiveData<Int> = MutableLiveData(1)
     val isBleConnectSuccess: MutableLiveData<Boolean> = MutableLiveData(false)
+
+//    init {
+//        setSettingReceiveCallback()
+//    }
 
     fun getDeviceInfo(context: Context){
        if (entity.deviceType.isNotEmpty()) deviceRepository.getDeviceInfo(entity).let {
@@ -137,5 +144,18 @@ class DeviceViewModel(
         }
     }
 
+
+    fun setSettingReceiveCallback()=  deviceRepository.setSettingReceiveCallback(bleSettingReceiveCallback)
+
+    private val bleSettingReceiveCallback = object : BleDataReceiveListener{
+        override fun onRadarData(data: ByteArray) {
+            super.onRadarData(data)
+            Log.i("DeviceViewModel","onRadarData=>${data.toHexStringSpace()}")
+            val receiveString = String(data)
+            Log.i("DeviceViewModel","bleSettingReceiveCallback receiveString=>$receiveString")
+        }
+
+
+    }
 
 }

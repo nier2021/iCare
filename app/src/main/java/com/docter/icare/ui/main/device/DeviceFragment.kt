@@ -117,7 +117,7 @@ class DeviceFragment : BaseFragment() {
 //                   Log.i("DeviceFragment","發送藍芽修改床型=>${bedType.value}")
             }
         }
-
+        viewModel.setSettingReceiveCallback()
         activityViewModel.toolbarClickListener = toolbarClickListener
         return binding.root
     }

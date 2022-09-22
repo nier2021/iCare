@@ -135,9 +135,9 @@ class MainActivity : BaseActivity() {
             R.id.nav_activity_monitoring -> {
                 R.id.nav_activity_monitoring
 //                Log.i("MainActivity","activityMonitoringFragment")
-                navController.navigate(R.id.activityMonitoringFragment)//等做完再開啟
+//                navController.navigate(R.id.activityMonitoringFragment)//等做完再開啟
                 this@MainActivity.toast("尚未開放")
-                true
+                false
             }
             else -> {
                 //以上等做完再開啟

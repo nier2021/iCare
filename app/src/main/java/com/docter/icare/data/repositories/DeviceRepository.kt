@@ -11,7 +11,9 @@ import com.docter.icare.R
 import com.docter.icare.data.bleUtil.device.air.AirBleDataManager
 import com.docter.icare.data.bleUtil.device.radar.RadarBleDataManager
 import com.docter.icare.data.bleUtil.bleInterface.BleConnectListener
+import com.docter.icare.data.bleUtil.bleInterface.BleDataReceiveListener
 import com.docter.icare.data.bleUtil.bleInterface.BleScanCallback
+import com.docter.icare.data.bleUtil.device.radar.RadarBleManager
 import com.docter.icare.data.entities.view.AccountInfo
 import com.docter.icare.data.entities.view.DeviceEntity
 import com.docter.icare.data.network.SafeApiRequest
@@ -224,8 +226,8 @@ class DeviceRepository (
      fun setAppendDistance(bedType: Int){
          var isSend = false
          Log.i("DeviceRepository", "setAppendDistance")
-//         val distanceArray = arrayListOf<Int>()
-        val distanceArray = arrayListOf<String>()
+         val distanceArray = arrayListOf<Int>()
+//        val distanceArray = arrayListOf<String>()
 //        distanceArray.add(8)
 //        when(bedType){
 //            2 ->  distanceArray.add(10)
@@ -241,36 +243,36 @@ class DeviceRepository (
 //            1 -> distanceArray.add(18)
 //            else ->   distanceArray.add(20)
 //        }
-//         distanceArray.add(80)
-//         when(bedType){
-//             2 ->  distanceArray.add(100)
-//             3 ->  distanceArray.add(110)
-//             4 ->  distanceArray.add(110)
-//             else ->  distanceArray.add(100)
-//         }
+         distanceArray.add(80)
+         when(bedType){
+             2 ->  distanceArray.add(100)
+             3 ->  distanceArray.add(110)
+             4 ->  distanceArray.add(110)
+             else ->  distanceArray.add(100)
+         }
+        when(bedType){
+            1 -> distanceArray.add(120)
+            else ->  distanceArray.add(150)
+        }
+        when(bedType){
+            1 -> distanceArray.add(180)
+            else ->   distanceArray.add(200)
+        }
+//        distanceArray.add(80.toHexString())
 //        when(bedType){
-//            1 -> distanceArray.add(120)
-//            else ->  distanceArray.add(150)
+//            2 ->  distanceArray.add(100.toHexString())
+//            3 ->  distanceArray.add(110.toHexString())
+//            4 ->  distanceArray.add(110.toHexString())
+//            else ->  distanceArray.add(100.toHexString())
 //        }
 //        when(bedType){
-//            1 -> distanceArray.add(180)
-//            else ->   distanceArray.add(200)
+//            1 -> distanceArray.add(120.toHexString())
+//            else ->  distanceArray.add(150.toHexString())
 //        }
-        distanceArray.add(80.toHexString())
-        when(bedType){
-            2 ->  distanceArray.add(100.toHexString())
-            3 ->  distanceArray.add(110.toHexString())
-            4 ->  distanceArray.add(110.toHexString())
-            else ->  distanceArray.add(100.toHexString())
-        }
-        when(bedType){
-            1 -> distanceArray.add(120.toHexString())
-            else ->  distanceArray.add(150.toHexString())
-        }
-        when(bedType){
-            1 -> distanceArray.add(180.toHexString())
-            else ->   distanceArray.add(200.toHexString())
-        }
+//        when(bedType){
+//            1 -> distanceArray.add(180.toHexString())
+//            else ->   distanceArray.add(200.toHexString())
+//        }
 //        Log.i("RegulateDistanceAutoFragment", "setAppendDistance distanceArray [0]=>${distanceArray[0]},[1]=>${distanceArray[1]},[2]=>${distanceArray[2]},[3]=>${distanceArray[3]}")
         if (!isSend) {
             Log.i("RegulateDistanceAutoFragment", "setAppendDistance !isSend")
@@ -297,4 +299,13 @@ class DeviceRepository (
         }
     }
 
+    fun setSettingReceiveCallback(
+        bleSettingReceiveCallback: BleDataReceiveListener
+    ) {
+        radarBleDataManager.bleRadarDataListener = bleSettingReceiveCallback
+    }
+
+
+//    fun getRadarBleDataReceive() = radarBleDataManager.onRadarBleDataReceive()
+//    var bleSettingReceiveCallback: RadarBleDataManager? = null
 }

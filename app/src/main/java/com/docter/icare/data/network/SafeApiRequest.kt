@@ -28,6 +28,10 @@ abstract class SafeApiRequest(
 
         val json = JSONObject(Gson().toJson(body()))
         Log.i("SafeApiRequest","body() json=>$json")
+        // body() json=>{"message":"帳號密碼錯誤"}
+        if (json.has("message") && json.getString("message").equals("帳號密碼錯誤")) {
+            throw SidException("${resource.getString(R.string.error_login_acc_pass_incorrect)}，${resource.getString(R.string.please_login_again)}")
+        }
         if (json.has("success") && json.getInt("success") == 0) {
 
             throw when (val message = json.getJSONObject("message").getString("ch")) {

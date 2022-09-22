@@ -5,6 +5,7 @@ import com.docter.icare.R
 import com.docter.icare.data.entities.view.LoginEntity
 import com.docter.icare.data.network.SafeApiRequest
 import com.docter.icare.data.network.api.ApiService
+import com.docter.icare.data.network.api.response.LoginResponse2
 import com.docter.icare.data.preferences.PreferenceProvider
 import com.docter.icare.data.resource.*
 import com.docter.icare.utils.InputException
@@ -35,14 +36,16 @@ class LoginRepository (
 
     suspend fun login(
         entity: LoginEntity
-    ) = apiRequest { api.login(entity.account, entity.password) }.let {
-        if (it.sid.isNotBlank()) {
-//            Log.i("LoginRepository","account=>${entity.account} \n sid=>${it.sid} \n name=>${it.name}")
+    ) = apiRequest { api.login(entity.account, entity.password) }
+
+    fun save(entity: LoginEntity,data: LoginResponse2){
+        if (data.sid.isNotBlank()) {
+//            Log.i("LoginRepository","account=>${entity.account} \n sid=>${data.sid} \n name=>${data.name}")
             with(preference){
                 set(ACCOUNT, entity.account)
                 set(PASSWORD, entity.password)
-                set(SID, it.sid)
-                set(NAME, it.name)
+                set(SID, data.sid)
+                set(NAME, data.name)
             }
         }
     }

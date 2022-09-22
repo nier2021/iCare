@@ -70,7 +70,7 @@ class AirBleDataManager (context: Context) : BleConnectListener {
     }
 
     private val dataReceiveListener = object : BleDataReceiveListener {
-        override fun onReceive(data: ByteArray) {
+        override fun onAirReceive(data: ByteArray) {
             parsePacket(data)
         }
     }

@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import org.kodein.di.android.x.closestDI
 import org.kodein.di.instance
 import androidx.core.app.ActivityOptionsCompat.makeSceneTransitionAnimation
+import com.docter.icare.data.network.api.response.LoginResponse2
 import com.docter.icare.utils.Coroutines.main
 import com.docter.icare.utils.clearStack
 
@@ -66,25 +67,37 @@ class LoginFragment : BaseFragment() {
 
     private fun login(){
 //        Log.i("LoginFragment","login account=>${viewModel.entity.account},password=>${viewModel.entity.password} ")
-        progressDialog.show()
+        main{progressDialog.show()}
 
         lifecycleScope.launch {
             runCatching {
                 viewModel.login()
             }.onSuccess {
-                progressDialog.dismiss()
-                requireContext().toast(getString(R.string.login_success))
-                main {
-                    val intent = Intent()
-                    intent.setClass(requireActivity(), MainActivity::class.java).clearStack()
-                    startActivity(intent, makeSceneTransitionAnimation(requireActivity()).toBundle())
-//                    startActivity(Intent(requireActivity().applicationContext, MainActivity::class.java), makeSceneTransitionAnimation(requireActivity()).toBundle())
-                }
+                if (it.sid.isNotBlank()) { save(it) } else binding.root.snackbar("Server error")
             }.onFailure {
-                progressDialog.dismiss()
+                main { progressDialog.dismiss() }
                 it.printStackTrace()
                 binding.root.snackbar(it)
             }
+        }
+    }
+
+    private fun save(data: LoginResponse2){
+        runCatching {
+            viewModel.save(data)
+        }.onSuccess {
+            requireContext().toast(getString(R.string.login_success))
+            main {
+                progressDialog.dismiss()
+                val intent = Intent()
+                intent.setClass(requireActivity(), MainActivity::class.java).clearStack()
+                startActivity(intent, makeSceneTransitionAnimation(requireActivity()).toBundle())
+//                    startActivity(Intent(requireActivity().applicationContext, MainActivity::class.java), makeSceneTransitionAnimation(requireActivity()).toBundle())
+            }
+        }.onFailure {
+            main { progressDialog.dismiss() }
+            it.printStackTrace()
+            binding.root.snackbar(it)
         }
     }
 

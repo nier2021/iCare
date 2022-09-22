@@ -247,7 +247,7 @@ class AirBleManager constructor(private val context: Context) {
         ) {
             super.onCharacteristicChanged(gatt, characteristic)
 
-            bleDataReceiveListener?.onReceive(characteristic.value)
+            bleDataReceiveListener?.onAirReceive(characteristic.value)
 
         }
     }
