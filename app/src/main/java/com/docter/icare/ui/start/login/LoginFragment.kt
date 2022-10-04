@@ -92,7 +92,6 @@ class LoginFragment : BaseFragment() {
                 val intent = Intent()
                 intent.setClass(requireActivity(), MainActivity::class.java).clearStack()
                 startActivity(intent, makeSceneTransitionAnimation(requireActivity()).toBundle())
-//                    startActivity(Intent(requireActivity().applicationContext, MainActivity::class.java), makeSceneTransitionAnimation(requireActivity()).toBundle())
             }
         }.onFailure {
             main { progressDialog.dismiss() }

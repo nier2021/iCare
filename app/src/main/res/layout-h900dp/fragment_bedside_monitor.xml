@@ -5,6 +5,10 @@
     tools:context=".ui.main.bedside.BedsideMonitorFragment">
 
     <data>
+        <import type="android.view.View" />
+
+        <import type="com.docter.icare.data.entities.view.BedsideMonitorEntity" />
+
         <variable
             name="entity"
             type="com.docter.icare.data.entities.view.BedsideMonitorEntity" />
@@ -82,131 +86,295 @@
             app:layout_constraintTop_toBottomOf="@+id/tv_bed_status"
             tools:text="2020-01-03\n14:30:44" />
 
-
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/layout_data"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@drawable/btn_login_white"
             android:gravity="center"
-            android:padding="40dp"
-            android:layout_marginBottom="30dp"
+            android:padding="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/iv_frame_bed"
-            app:layout_constraintHorizontal_bias="0.504"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/iv_frame_bed"
             app:layout_constraintTop_toBottomOf="@+id/iv_frame_bed">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/layout_heart_rate"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="5"
+                android:layout_weight="20"
+                android:gravity="center"
                 android:orientation="vertical">
 
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_heart_rate_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="4"
+                    android:padding="10dp"
+                    android:src="@drawable/icon_heart_rate_blue" />
+
+
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tv_heart_rate_title"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_heart_rate"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="7"
-                    android:padding="5dp"
-                    android:text="@string/heart_rate"
-                    android:textAlignment="textStart"
+                    android:layout_weight="4"
+                    android:gravity="center"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:text="@{entity.heartRate.length > 0 ? entity.heartRate : @string/no_data_text}"
+                    android:textColor="@{entity.heartRate.length > 0 ? entity.heartRateTextColor :   @color/radar_out_bed_color}"
+                    android:textSize="36sp"
+                    tools:text="66"
+                    tools:textColor="#66BAFF" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_heart_rate_unit"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/heart_rate_unit"
                     android:textColor="@color/black"
-                    android:textSize="30sp" />
-
-                <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/layout_heart_rate_data"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="3"
-                    android:padding="10dp">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv_heart_rate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="5"
-                        android:text="@{entity.heartRate.length > 0 ? entity.heartRate : @string/no_data_text}"
-                        android:textAlignment="textEnd"
-                        android:textColor="@{entity.textColorBedStatus == -1 ? @color/radar_out_bed_color : entity.textColorBedStatus }"
-                        android:textSize="60sp"
-                        tools:text="66"
-                        tools:textColor="#66BAFF" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv_heart_rate_unit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="5"
-                        android:gravity="bottom"
-                        android:text="@string/heart_rate_unit"
-                        android:textColor="@color/black"
-                        android:textSize="30sp" />
-                </androidx.appcompat.widget.LinearLayoutCompat>
+                    android:textSize="16sp" />
+                <!--                </androidx.appcompat.widget.LinearLayoutCompat>-->
             </androidx.appcompat.widget.LinearLayoutCompat>
 
             <View
-                android:id="@+id/data_space"
-                android:layout_width="5dp"
+                android:id="@+id/space"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_weight="10"
+                android:layout_weight="1"
                 android:background="@color/radar_in_bed_color" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/layout_breath_state"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="5"
+                android:layout_weight="20"
+                android:gravity="center"
                 android:orientation="vertical">
 
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_breath_state_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="4"
+                    android:padding="10dp"
+                    android:src="@drawable/icon_breath_frequency_blue" />
+
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tv_breath_state_title"
+                    android:id="@+id/tv_breath_state"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:text="@{entity.breathState.length > 0 ? entity.breathState : @string/no_data_text}"
+                    android:textColor="@{entity.breathState.length > 0 ? entity.breathStateTextColor : @color/radar_out_bed_color }"
+                    android:textSize="36sp"
+                    tools:text="16"
+                    tools:textColor="#66BAFF" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_breath_state_unit"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_weight="7"
-                    android:padding="5dp"
-                    android:text="@string/breath_frequency"
-                    android:textAlignment="textStart"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/breath_state_unit"
                     android:textColor="@color/black"
-                    android:textSize="30sp" />
+                    android:textSize="16sp" />
+                <!--                </androidx.appcompat.widget.LinearLayoutCompat>-->
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
-                <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/layout_breath_state_data"
+
+            <View
+                android:id="@+id/space1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_weight="1"
+                android:background="@color/radar_in_bed_color"
+                android:visibility="@{entity.bodyTemperature.length > 0 ? View.VISIBLE : View.GONE}"/>
+            <!--            android:visibility="@{entity.bodyTemperature.length > 0 ? View.VISIBLE : View.GONE}"-->
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/layout_body_temperature"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="20"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="@{entity.bodyTemperature.length > 0 ? View.VISIBLE : View.GONE}">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_body_temperature_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="4"
+                    android:padding="10dp"
+                    android:src="@{entity.iconBedStatus == null ? @drawable/icon_body_temperature_blue : entity.iconBodyTemperature }"
+                    tools:src="@drawable/icon_body_temperature_blue"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_body_temperature"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="5"
+                    android:gravity="center"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:text="@{entity.bodyTemperature == BedsideMonitorEntity.BODY_TEMPERATURE_ERROR  ? @string/no_data_text : entity.bodyTemperature}"
+                    android:textColor="@{entity.bodyTemperature == BedsideMonitorEntity.BODY_TEMPERATURE_ERROR  ? @color/radar_out_bed_color : entity.bodyTemperatureTextColor }"
+                    android:textSize="36sp"
+                    tools:text="16"
+                    tools:textColor="#66BAFF" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_body_temperature_unit"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="3"
-                    android:padding="10dp">
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv_breath_state"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="5"
-                        android:text="@{entity.breathState.length > 0 ? entity.breathState : @string/no_data_text}"
-                        android:textAlignment="textEnd"
-                        android:textColor="@{entity.textColorBedStatus == -1 ? @color/radar_out_bed_color : entity.textColorBedStatus }"
-                        android:textSize="60sp"
-                        tools:text="16"
-                        tools:textColor="#66BAFF" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/tv_breath_state_unit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="3"
-                        android:gravity="bottom"
-                        android:text="@string/breath_state_unit"
-                        android:textColor="@color/black"
-                        android:textSize="30sp" />
-                </androidx.appcompat.widget.LinearLayoutCompat>
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="@string/body_temperature_unit"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+                <!--                </androidx.appcompat.widget.LinearLayoutCompat>-->
             </androidx.appcompat.widget.LinearLayoutCompat>
 
         </androidx.appcompat.widget.LinearLayoutCompat>
+
+<!--        <androidx.appcompat.widget.LinearLayoutCompat-->
+<!--            android:id="@+id/layout_data"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="@drawable/btn_login_white"-->
+<!--            android:gravity="center"-->
+<!--            android:padding="40dp"-->
+<!--            android:layout_marginBottom="30dp"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="@+id/iv_frame_bed"-->
+<!--            app:layout_constraintHorizontal_bias="0.504"-->
+<!--            app:layout_constraintStart_toStartOf="@+id/iv_frame_bed"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/iv_frame_bed">-->
+
+<!--            <androidx.appcompat.widget.LinearLayoutCompat-->
+<!--                android:id="@+id/layout_heart_rate"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="5"-->
+<!--                android:orientation="vertical">-->
+
+<!--                <androidx.appcompat.widget.AppCompatTextView-->
+<!--                    android:id="@+id/tv_heart_rate_title"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:layout_weight="7"-->
+<!--                    android:padding="5dp"-->
+<!--                    android:text="@string/heart_rate"-->
+<!--                    android:textAlignment="textStart"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp" />-->
+
+<!--                <androidx.appcompat.widget.LinearLayoutCompat-->
+<!--                    android:id="@+id/layout_heart_rate_data"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:layout_weight="3"-->
+<!--                    android:padding="10dp">-->
+
+<!--                    <androidx.appcompat.widget.AppCompatTextView-->
+<!--                        android:id="@+id/tv_heart_rate"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_weight="5"-->
+<!--                        android:text="@{entity.heartRate.length > 0 ? entity.heartRate : @string/no_data_text}"-->
+<!--                        android:textAlignment="textEnd"-->
+<!--                        android:textColor="@{entity.textColorBedStatus == -1 ? @color/radar_out_bed_color : entity.textColorBedStatus }"-->
+<!--                        android:textSize="60sp"-->
+<!--                        tools:text="66"-->
+<!--                        tools:textColor="#66BAFF" />-->
+
+<!--                    <androidx.appcompat.widget.AppCompatTextView-->
+<!--                        android:id="@+id/tv_heart_rate_unit"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_weight="5"-->
+<!--                        android:gravity="bottom"-->
+<!--                        android:text="@string/heart_rate_unit"-->
+<!--                        android:textColor="@color/black"-->
+<!--                        android:textSize="30sp" />-->
+<!--                </androidx.appcompat.widget.LinearLayoutCompat>-->
+<!--            </androidx.appcompat.widget.LinearLayoutCompat>-->
+
+<!--            <View-->
+<!--                android:id="@+id/data_space"-->
+<!--                android:layout_width="5dp"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:layout_marginBottom="10dp"-->
+<!--                android:layout_marginStart="20dp"-->
+<!--                android:layout_marginEnd="20dp"-->
+<!--                android:layout_weight="10"-->
+<!--                android:background="@color/radar_in_bed_color" />-->
+
+<!--            <androidx.appcompat.widget.LinearLayoutCompat-->
+<!--                android:id="@+id/layout_breath_state"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="5"-->
+<!--                android:orientation="vertical">-->
+
+<!--                <androidx.appcompat.widget.AppCompatTextView-->
+<!--                    android:id="@+id/tv_breath_state_title"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:layout_weight="7"-->
+<!--                    android:padding="5dp"-->
+<!--                    android:text="@string/breath_frequency"-->
+<!--                    android:textAlignment="textStart"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="30sp" />-->
+
+<!--                <androidx.appcompat.widget.LinearLayoutCompat-->
+<!--                    android:id="@+id/layout_breath_state_data"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:layout_weight="3"-->
+<!--                    android:padding="10dp">-->
+
+<!--                    <androidx.appcompat.widget.AppCompatTextView-->
+<!--                        android:id="@+id/tv_breath_state"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_weight="5"-->
+<!--                        android:text="@{entity.breathState.length > 0 ? entity.breathState : @string/no_data_text}"-->
+<!--                        android:textAlignment="textEnd"-->
+<!--                        android:textColor="@{entity.textColorBedStatus == -1 ? @color/radar_out_bed_color : entity.textColorBedStatus }"-->
+<!--                        android:textSize="60sp"-->
+<!--                        tools:text="16"-->
+<!--                        tools:textColor="#66BAFF" />-->
+
+<!--                    <androidx.appcompat.widget.AppCompatTextView-->
+<!--                        android:id="@+id/tv_breath_state_unit"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_weight="3"-->
+<!--                        android:gravity="bottom"-->
+<!--                        android:text="@string/breath_state_unit"-->
+<!--                        android:textColor="@color/black"-->
+<!--                        android:textSize="30sp" />-->
+<!--                </androidx.appcompat.widget.LinearLayoutCompat>-->
+<!--            </androidx.appcompat.widget.LinearLayoutCompat>-->
+
+<!--        </androidx.appcompat.widget.LinearLayoutCompat>-->
     </androidx.constraintlayout.widget.ConstraintLayout>
     <!--平板版以上-->
     <!--手機用 以下-->

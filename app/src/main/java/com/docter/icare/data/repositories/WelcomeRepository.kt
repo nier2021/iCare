@@ -26,7 +26,11 @@ class WelcomeRepository (
         WRITE_EXTERNAL_STORAGE,
         READ_EXTERNAL_STORAGE,
         ACCESS_COARSE_LOCATION,
-        ACCESS_FINE_LOCATION
+        ACCESS_FINE_LOCATION,
+        ACCESS_WIFI_STATE,
+        CHANGE_NETWORK_STATE,
+//        WRITE_SETTINGS
+
     )
     //未來有需求改變
     val permissionArrayVerS = arrayOf(
@@ -36,7 +40,10 @@ class WelcomeRepository (
         ACCESS_COARSE_LOCATION,
         ACCESS_FINE_LOCATION,
         BLUETOOTH_SCAN,
-        BLUETOOTH_CONNECT
+        BLUETOOTH_CONNECT,
+        ACCESS_WIFI_STATE,
+        CHANGE_NETWORK_STATE,
+//        WRITE_SETTINGS
     )
 
     fun isNeedAskPermission() =

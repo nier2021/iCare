@@ -49,29 +49,49 @@ class DeviceRepository (
             Log.i("DeviceRepository","deviceBindingRequest device=>$device\n  type=>$type\n deviceType=>$deviceType")
             Log.i("DeviceRepository","deviceBindingRequest SID=>${preference.getString(SID)}")
             api.bindingRadarDevice(
-                preference.getString(SID),
-                type,
-                if (type == 1) {
+               sid= preference.getString(SID),
+                type= type,
+                serialNumber= if (type == 1) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
                         ActivityCompat.checkSelfPermission(context,
                             Manifest.permission.BLUETOOTH_SCAN
                         ) != PackageManager.PERMISSION_GRANTED
                     ) {
-                        Log.i("DeviceRepository","deviceBindingRequest ++++++")
+                        Log.i("DeviceRepository","deviceBindingRequest serialNumber++++++")
                         throw SidException(resource.getString(R.string.ask_permission_again_title))
                     }
-                    Log.i("DeviceRepository","deviceBindingRequest --------")
+                    Log.i("DeviceRepository","deviceBindingRequest serialNumber--------")
                     device!!.name
                 } else {
 //                    "Radar"
                     if (deviceType == "Radar") {
-                        Log.i("DeviceRepository","deviceBindingRequest device Radar=>${ preference.getString(RADAR_DEVICE_NAME)}")
+                        Log.i("DeviceRepository","deviceBindingRequest device Radar serialNumber=>${ preference.getString(RADAR_DEVICE_NAME)}")
                         preference.getString(RADAR_DEVICE_NAME)
                     } else {
                         preference.getString(AIR_DEVICE_NAME)
                     }
                 },
-                if (deviceType ==  "Radar") {
+                macAddress =  if (type == 1) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                        ActivityCompat.checkSelfPermission(context,
+                            Manifest.permission.BLUETOOTH_SCAN
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        Log.i("DeviceRepository","deviceBindingRequest macAddress++++++")
+                        throw SidException(resource.getString(R.string.ask_permission_again_title))
+                    }
+                    Log.i("DeviceRepository","deviceBindingRequest macAddress--------")
+                    device!!.address
+                } else {
+//                    "Radar"
+                    if (deviceType == "Radar") {
+                        Log.i("DeviceRepository","deviceBindingRequest device Radar macAddress=>${ preference.getString(RADAR_DEVICE_MAC)}")
+                        preference.getString(RADAR_DEVICE_MAC)
+                    } else {
+                        preference.getString(AIR_DEVICE_MAC)
+                    }
+                },
+                deviceType = if (deviceType ==  "Radar") {
                     Log.i("DeviceRepository","deviceBindingRequest device Radar")
                     0
                 } else {
@@ -128,23 +148,22 @@ class DeviceRepository (
 
     fun getDeviceInfo(deviceEntity: DeviceEntity):DeviceEntity{
         if (deviceEntity.deviceType == "Radar"){
+            deviceEntity.type.value = DeviceEntity.RADAR
             with(preference){
                 deviceEntity.deviceMac = getString(RADAR_DEVICE_MAC)
                 deviceEntity.deviceName = getString(RADAR_DEVICE_NAME,)
 //                Log.i("DeviceRepository","getDeviceInfo name=>${deviceEntity.deviceName}")
                 deviceEntity.wifiAccount.value = getString(WIFI_NAME)
-                deviceEntity.wifiPassword.value = getString(WIFI_PASS)
-                deviceEntity.isWifiBind.value = getBoolean(IS_WIFI)
+                deviceEntity.wifiPassword = getString(WIFI_PASS)
                 deviceEntity.bedType = getInt(BED_TYPE,-1)
             }
         }else{
+            deviceEntity.type.value = DeviceEntity.AIR
             with(preference){
                 deviceEntity.deviceMac =  getString(AIR_DEVICE_MAC)
                 deviceEntity.deviceName = getString(AIR_DEVICE_NAME)
-//                deviceEntity.deviceAccountId = getString(AIR_DEVICE_ACCOUNT_ID)
                 deviceEntity.wifiAccount.value = getString(WIFI_NAME)
-                deviceEntity.wifiPassword.value = getString(WIFI_PASS)
-                deviceEntity.isWifiBind.value = getBoolean(IS_WIFI)
+                deviceEntity.wifiPassword = getString(WIFI_PASS)
             }
         }
         return deviceEntity
@@ -154,27 +173,27 @@ class DeviceRepository (
 
     fun isConnect(deviceType: String)= if (deviceType == "Radar") radarBleDataManager.isConnect else airBleDataManager.isConnect
 
-    fun checkInput(entity: DeviceEntity){
-        when {
-            entity.wifiAccount.value?.isBlank() == true -> throw InputException(resource.getString(R.string.error_wifi_account_empty))
-            entity.wifiAccount.value!!.length > 20 -> throw InputException(resource.getString(R.string.error_wifi_length))
-
-            entity.wifiPassword.value?.isBlank() == true -> throw InputException(resource.getString(R.string.error_wifi_password_empty))
-            entity.wifiPassword.value!!.length > 20 -> throw InputException(resource.getString(R.string.error_wifi_length))
-            entity.wifiAccount.value!!.isSpecialSymbols() || entity.wifiPassword.value!!.isSpecialSymbols()-> throw InputException(resource.getString(R.string.error_wifi_special_symbols))
+    fun saveWifiData(wifiAccount: String, wifiPassword: String){
+        with(preference){
+            Log.i("DeviceRepository","wifiSet save wifi name pass")
+            set(WIFI_NAME, wifiAccount)
+            set(WIFI_PASS, wifiPassword)
         }
     }
 
-    fun wifiSetData(entity: DeviceEntity,accountInfo: AccountInfo){
-        if (entity.wifiAccount.value?.isEmpty() == true || entity.wifiPassword.value?.isEmpty() == true){
+    fun wifiSetData(deviceType: String,accountInfo: AccountInfo){
+
+        val getWifiAccount: String = preference.getString(WIFI_NAME)
+        val getWifiPassword: String = preference.getString(WIFI_PASS)
+
+        if (getWifiAccount.isEmpty() || getWifiPassword.isEmpty()){
             Log.i("DeviceRepository","wifiSet wifi帳密為空")
-           return
+            return
         }
-        if (entity.wifiAccount.value!!.length >20 || entity.wifiPassword.value!!.length >20){
+        if (getWifiAccount.length >20 || getWifiPassword.length >20){
             Log.i("DeviceRepository","wifiSet wifi帳密為超過20字元")
             return
         }
-
 
         if (accountInfo.account.isEmpty() || accountInfo.password.isEmpty() || accountInfo.sid.isEmpty()){
             Log.i("DeviceRepository","wifiSet user帳密sid為空")
@@ -186,17 +205,17 @@ class DeviceRepository (
             return
         }
 
-        if (entity.deviceType == "Radar" && !radarBleDataManager.isConnect){
+        if (deviceType == "Radar" && !radarBleDataManager.isConnect){
             Log.i("DeviceRepository","wifiSet Radar isConnect false")
             return
         }
 
-        if (entity.deviceType == "Air" && !airBleDataManager.isConnect){
+        if (deviceType == "Air" && !airBleDataManager.isConnect){
             Log.i("DeviceRepository","wifiSet Air isConnect false")
             return
         }
 
-        val sendData = "MOSA${entity.wifiAccount.value},${entity.wifiPassword.value},${
+        val sendData = "MOSA${getWifiAccount},${getWifiPassword},${
             accountInfo.account
         },${
             accountInfo.password
@@ -205,7 +224,7 @@ class DeviceRepository (
         }"
 
 
-        if (entity.deviceType == "Radar") {
+        if (deviceType == "Radar") {
             radarBleDataManager.writeValue(sendData)
             Log.i("DeviceRepository","wifiSet Radar writeValue")
         } else {
@@ -214,12 +233,6 @@ class DeviceRepository (
 //            AirBleDataManager.getInstance(requireActivity()).writeValue(sendData)
         }
         Log.i("DeviceRepository","wifiSetData sendData=>$sendData")
-        with(preference){
-            Log.i("DeviceRepository","wifiSet save wifi name pass")
-            set(WIFI_NAME, entity.wifiAccount.value!!)
-            set(WIFI_PASS, entity.wifiPassword.value!!)
-            set(IS_WIFI, true)
-        }
     }
 
     //1->a:80 b:100 c:120 d:180 , 2->a:80 b:100 c:150 d:200 , 3->a:80 b:110 c:150 d:200 , 4->a:80 b:110 c:150 d:200
@@ -305,6 +318,9 @@ class DeviceRepository (
         radarBleDataManager.bleRadarDataListener = bleSettingReceiveCallback
     }
 
+    fun setType(type: String): Int {
+         return if (type == "Radar") DeviceEntity.RADAR else DeviceEntity.AIR
+    }
 
 //    fun getRadarBleDataReceive() = radarBleDataManager.onRadarBleDataReceive()
 //    var bleSettingReceiveCallback: RadarBleDataManager? = null

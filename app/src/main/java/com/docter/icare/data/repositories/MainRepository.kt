@@ -1,20 +1,14 @@
 package com.docter.icare.data.repositories
 
-import android.Manifest
-import android.bluetooth.BluetoothDevice
-import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
 import android.util.Log
-import androidx.core.app.ActivityCompat
 import com.docter.icare.R
-import com.docter.icare.data.bleUtil.bleInterface.BleConnectListener
 import com.docter.icare.data.bleUtil.device.air.AirBleDataManager
 import com.docter.icare.data.bleUtil.device.radar.RadarBleDataManager
 import com.docter.icare.data.entities.device.DeviceInfoEntity
 import com.docter.icare.data.entities.view.ExpandableListEntity
 import com.docter.icare.data.network.SafeApiRequest
 import com.docter.icare.data.network.api.ApiService
+import com.docter.icare.data.network.api.response.CheckDeviceResponse
 import com.docter.icare.data.preferences.PreferenceProvider
 import com.docter.icare.data.resource.*
 import com.docter.icare.utils.SidException
@@ -69,16 +63,22 @@ class MainRepository(
         apiRequest{
             Log.i("MainRepository","deviceBindingRequest SID=>${preference.getString(SID)}")
             api.bindingRadarDevice(
-                preference.getString(SID),
-                0,
-                if (deviceType == "Radar") {
-                    Log.i("MainRepository","deviceUnBindingRequest unDevice Radar=>${deviceInfoEntity.radarDeviceName}")
+                sid = preference.getString(SID),
+                type = 0,
+                serialNumber = if (deviceType == "Radar") {
+                    Log.i("MainRepository","deviceUnBindingRequest unDevice Radar DeviceName=>${deviceInfoEntity.radarDeviceName}")
                     deviceInfoEntity.radarDeviceName
                 }else{
                     deviceInfoEntity.airDeviceName
                 },
+                macAddress =  if (deviceType == "Radar") {
+                    Log.i("MainRepository","deviceUnBindingRequest unDevice Radar DeviceMac=>${deviceInfoEntity.radarDeviceMac}")
+                    deviceInfoEntity.radarDeviceMac
+                }else{
+                    deviceInfoEntity.airDeviceMac
+                },
 
-                if (deviceType == "Radar") {
+               deviceType =  if (deviceType == "Radar") {
                     Log.i("DeviceRepository","deviceBindingRequest device Radar")
                     0
                 } else {
@@ -130,5 +130,91 @@ class MainRepository(
             set(SID, "")
             set(NAME, "")
         }
+    }
+
+
+    suspend fun getAccountDeviceInfo():MutableList<CheckDeviceResponse.DeviceInfo> = apiRequest{
+        Log.i("DeviceRepository","getAccountDeviceInfo")
+//        api.checkDevice(preference.getString(SID))
+        api.checkDevice("hueuan4")
+    }.let { res ->
+        if (res.success == 1){
+            Log.i("DeviceRepository","getAccountDeviceInfo success data=>${res.data}")
+            if (res.data.isNotEmpty()){
+//                getDeviceInfoList.forEach { saveDevice(it) }
+                setDevice(0,res.data.firstOrNull { it.deviceType == 0 })
+                setDevice(1,res.data.firstOrNull { it.deviceType == 1 })
+                //感知器會有多台 無法使用first 假如deviceType是4
+                val getActivityDeviceList: MutableList<CheckDeviceResponse.DeviceInfo> = mutableListOf()
+                res.data.map { if (it.deviceType == 4) getActivityDeviceList.add(it) }
+                if (getActivityDeviceList.isNotEmpty()) getActivityDeviceList.map { Log.i("DeviceRepository","看如何新增多台紀錄 db?") } else Log.i("DeviceRepository","看如何移除多台紀錄 db?")
+            }else{
+                //表示無裝置
+                allClean()
+            }
+
+//            if (getDeviceInfoList.isNotEmpty()) Log.i("getAccountDeviceInfo","getDeviceInfoList[0] serialNumber=>${getDeviceInfoList[0].serialNumber}\n deviceType=>${getDeviceInfoList[0].deviceType}")
+            return res.data.toMutableList()
+        }else throw SidException(res.message)
+
+    }
+
+    private fun setDevice(deviceType: Int, device: CheckDeviceResponse.DeviceInfo? ){
+        //正式測試ok再開
+        when (deviceType){
+            0 ->{
+                if (device != null ){
+                    Log.i("DeviceRepository","save air")
+//                    with(preference){
+//                        set(AIR_DEVICE_NAME, device.serialNumber)
+//                        set(AIR_DEVICE_MAC, device.macAddress)
+//                        set(AIR_DEVICE_ACCOUNT_ID, device.accountId)
+//                    }
+                }else{
+                    Log.i("DeviceRepository","remove air")
+//                    with(preference){
+//                        set(AIR_DEVICE_NAME, "")
+//                        set(AIR_DEVICE_MAC,"")
+//                        set(AIR_DEVICE_ACCOUNT_ID,"")
+//                    }
+                }
+            }
+            1 ->{
+                if (device != null ){
+                    Log.i("DeviceRepository","save radar")
+//                    with(preference){
+//                        set(RADAR_DEVICE_NAME, device.serialNumber)
+//                        set(RADAR_DEVICE_MAC, device.macAddress)
+//                        set(RADAR_DEVICE_ACCOUNT_ID,device.accountId)
+//                        set(BED_TYPE,1)
+//                    }
+                }else{
+                    Log.i("DeviceRepository","remove radar")
+//                    with(preference){
+//                        set(RADAR_DEVICE_MAC, "")
+//                        set(RADAR_DEVICE_NAME, "")
+//                        set(RADAR_DEVICE_ACCOUNT_ID,"")
+//                        set(BED_TYPE,-1)
+//                    }
+                }
+            }
+        }
+    }
+
+    private fun allClean(){
+        Log.i("DeviceRepository","remove all")
+        //正式測試ok再開
+//        with(preference){
+//            //雷達波
+//            set(RADAR_DEVICE_MAC, "")
+//            set(RADAR_DEVICE_NAME, "")
+//            set(RADAR_DEVICE_ACCOUNT_ID,"")
+//            set(BED_TYPE,-1)
+//            //空氣盒子
+//            set(AIR_DEVICE_MAC,"")
+//            set(AIR_DEVICE_NAME, "")
+//            set(AIR_DEVICE_ACCOUNT_ID,"")
+//        }
+        //未做多台感知器移除方法
     }
 }

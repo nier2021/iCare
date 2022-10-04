@@ -8,4 +8,5 @@ data class BioRadarEntity(
     val heart_rate: String = "",//心率
     val bed_state: String = "",//未離床|正躺|側躺|坐在床邊
     val breath_state: String = "",//呼吸頻率
+    val temperature: String = "", //體溫
 )

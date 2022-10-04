@@ -25,4 +25,7 @@
     <color name="radar_side_bed_color">#10A6DF</color>
     <color name="radar_out_bed_color">#9F9F9F</color>
     <color name="radar_out_bed_color_alert">#FF849D</color>
+    <color name="radar_device_background_image_color">#FF5BC3C4</color>
+    <color name="air_device_background_image_color">#FF10A6DF</color>
+
 </resources>

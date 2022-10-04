@@ -9,8 +9,13 @@ import com.docter.icare.R
 import com.docter.icare.data.entities.view.BedsideMonitorEntity
 import com.docter.icare.data.entities.webSocket.SocketUpdate
 import com.docter.icare.data.repositories.RadarRepository
+import com.docter.icare.utils.Coroutines.io
 import com.docter.icare.utils.toRadarShowDate
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.schedulers.Schedulers.io
 import kotlinx.coroutines.channels.Channel
+import java.util.concurrent.TimeUnit
 
 class BedsideMonitorViewModel(
     private val radarRepository: RadarRepository,
@@ -47,7 +52,29 @@ class BedsideMonitorViewModel(
                                 ContextCompat.getColor(context, R.color.radar_in_bed_color)
                             time.value = data.bioRadar.time.toRadarShowDate()
                             heartRate.value = data.bioRadar.heart_rate
+                            heartRateTextColor.value = ContextCompat.getColor(context, R.color.radar_side_bed_color)
+                            //心率icon與文字顏色判斷等後端送上下限值在做
                             breathState.value = data.bioRadar.breath_state
+                            breathStateTextColor.value = ContextCompat.getColor(context, R.color.radar_side_bed_color)
+                            //呼吸頻率icon與文字顏色判斷等後端送上下限值在做
+                            bodyTemperature.value =  data.bioRadar.temperature
+//                            bodyTemperature.value = getRandomBt()
+                            if (bodyTemperature.value?.isNotBlank() == true) {
+                                when(bodyTemperature.value!!.toInt()) {
+                                    -1 ->{
+                                        bodyTemperatureTextColor.value = ContextCompat.getColor(context, R.color.radar_out_bed_color)
+                                        iconBodyTemperature.value =  ContextCompat.getDrawable(context, R.drawable.icon_body_temperature_blue)
+                                    }
+                                    in 35..38 -> {
+                                        bodyTemperatureTextColor.value = ContextCompat.getColor(context, R.color.radar_side_bed_color)
+                                        iconBodyTemperature.value =  ContextCompat.getDrawable(context, R.drawable.icon_body_temperature_blue)
+                                    }
+                                    else ->{
+                                        bodyTemperatureTextColor.value = ContextCompat.getColor(context, R.color.radar_out_bed_color_alert)
+                                        iconBodyTemperature.value =  ContextCompat.getDrawable(context, R.drawable.icon_body_temperature_red)
+                                    }
+                                }
+                            }
                         }
                     }
                     else -> {
@@ -60,8 +87,12 @@ class BedsideMonitorViewModel(
                             textColorBedStatus.value =
                                 ContextCompat.getColor(context, R.color.radar_side_bed_color)
                             time.value = data.bioRadar.time.toRadarShowDate()
-                            heartRate.value = "--"
-                            breathState.value = "--"
+                            heartRate.value = ""
+//                            heartRateTextColor.value = ContextCompat.getColor(context, R.color.radar_side_bed_color)
+                            breathState.value = ""
+//                            breathStateTextColor.value = ContextCompat.getColor(context, R.color.radar_side_bed_color)
+                            bodyTemperature.value = if ( data.bioRadar.temperature.isNotBlank()) "-1" else ""
+//                            bodyTemperatureTextColor.value = ContextCompat.getColor(context, R.color.radar_side_bed_color)
                         }
                     }
                 }
@@ -75,8 +106,12 @@ class BedsideMonitorViewModel(
                     textColorBedStatus.value =
                         ContextCompat.getColor(context, R.color.radar_out_bed_color)
                     time.value = data.bioRadar.time.toRadarShowDate()
-                    heartRate.value = "--"
-                    breathState.value = "--"
+                    heartRate.value = ""
+//                    heartRateTextColor.value = ContextCompat.getColor(context, R.color.radar_side_bed_color)
+                    breathState.value = ""
+//                    breathStateTextColor.value = ContextCompat.getColor(context, R.color.radar_side_bed_color)
+                    bodyTemperature.value = if ( data.bioRadar.temperature.isNotBlank()) "-1" else ""
+//                    bodyTemperatureTextColor.value = ContextCompat.getColor(context, R.color.radar_side_bed_color)
                 }
             }
 
@@ -162,42 +197,48 @@ class BedsideMonitorViewModel(
     fun socketError(context: Context) {
         Log.i("BedsideMonitorViewModel","socketError")
         with(entity) {
-            breathState.value = "--"
+            breathState.value = ""
             iconBedStatus.value = ContextCompat.getDrawable(context, R.drawable.icon_error_device)
             frameBedStatus.value = ContextCompat.getDrawable(context, R.drawable.icon_unbind_device_round)
             textBedStatus.value = context.getString(R.string.error_text)
             textColorBedStatus.value = ContextCompat.getColor(context, R.color.radar_out_bed_color)
-            time.value = "--"
-            heartRate.value= "--"
-            breathState.value = "--"
+            time.value = ""
+            heartRate.value= ""
+            breathState.value = ""
+            bodyTemperature.value = ""
         }
     }
 
     fun closeSocket(context: Context) {
         Log.i("BedsideMonitorViewModel","closeSocket")
         with(entity) {
-            breathState.value = "--"
+            breathState.value = ""
             iconBedStatus.value = ContextCompat.getDrawable(context, R.drawable.icon_unbind_device)
             frameBedStatus.value = ContextCompat.getDrawable(context, R.drawable.icon_unbind_device_round)
             textBedStatus.value = context.getString(R.string.radar_status_unbind_text)
             textColorBedStatus.value = ContextCompat.getColor(context, R.color.radar_out_bed_color)
-            time.value = "--"
-            heartRate.value = "--"
-            breathState.value = "--"
+            time.value = ""
+            heartRate.value = ""
+            breathState.value = ""
+            bodyTemperature.value = ""
         }
     }
 
     fun bindDeviceShow(context: Context){
         Log.i("BedsideMonitorViewModel","closeSocket")
         with(entity) {
-            breathState.value = "--"
+            breathState.value = ""
             iconBedStatus.value = ContextCompat.getDrawable(context, R.drawable.icon_wifi_link)
             frameBedStatus.value = ContextCompat.getDrawable(context, R.drawable.icon_unbind_device_round)
             textBedStatus.value = context.getString(R.string.wifi_link_text)
             textColorBedStatus.value = ContextCompat.getColor(context, R.color.radar_out_bed_color)
-            time.value = "--"
-            heartRate.value= "--"
-            breathState.value = "--"
+            time.value = ""
+            heartRate.value= ""
+            breathState.value = ""
+            bodyTemperature.value = ""
         }
     }
+
+    private fun getRandomBt()= (30.. 40).random().toString()
+
 }

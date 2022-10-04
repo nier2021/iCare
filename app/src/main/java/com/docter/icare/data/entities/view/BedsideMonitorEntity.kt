@@ -9,8 +9,15 @@ data class BedsideMonitorEntity(
     val textBedStatus: MutableLiveData<String> = MutableLiveData(""),//床上狀態
     var textColorBedStatus: MutableLiveData<Int> = MutableLiveData(-1),//床上狀態顏色
     var time: MutableLiveData<String> = MutableLiveData(""),//資料時間
+    val iconHeartRate: MutableLiveData<Drawable> = MutableLiveData(null),//心率圖示
     var heartRate: MutableLiveData<String> = MutableLiveData(""),//心率 bpm
+    var heartRateTextColor: MutableLiveData<Int> = MutableLiveData(-1),//心率顏色
+    val iconBreathState: MutableLiveData<Drawable> = MutableLiveData(null),//呼吸頻率圖示
     var breathState: MutableLiveData<String> = MutableLiveData(""),//呼吸頻率 brpm
+    var breathStateTextColor: MutableLiveData<Int> = MutableLiveData(-1),//呼吸頻率顏色
+    val iconBodyTemperature: MutableLiveData<Drawable> = MutableLiveData(null),//呼吸頻率圖示
+    var bodyTemperature: MutableLiveData<String> = MutableLiveData(""),//體溫
+    var bodyTemperatureTextColor: MutableLiveData<Int> = MutableLiveData(-1),//體溫狀態顏色
 //    var iconBedStatus: Drawable? = null,//中間圖示
 //    var frameBedStatus: Drawable? = null,//外框圖示
 //    var textBedStatus: String = "",//床上狀態
@@ -18,4 +25,8 @@ data class BedsideMonitorEntity(
 //    var time: String ="",//資料時間
 //    var heartRate: String = "",//心率 bpm
 //    var breathState: String = "",//呼吸頻率 brpm
-)
+){
+    companion object {
+        const val BODY_TEMPERATURE_ERROR = "-1"
+    }
+}

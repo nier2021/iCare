@@ -42,8 +42,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:titleCentered="true"
-                    app:navigationIcon="@{entity.isDrawerBottomViewShow ? @drawable/icon_main_menu : @drawable/icon_back}"
-                    app:menu="@menu/bottom_nav_menu"/>
+                    app:menu="@menu/bottom_nav_menu"
+                    app:navigationIcon="@{entity.isDrawerBottomViewShow ? @drawable/icon_main_menu : @drawable/icon_back}" />
+<!--                app:menu="@menu/top_menu"-->
 <!--                app:navigationIcon="@{entity.nowFragment >-1 ? @drawable/icon_main_menu : @drawable/icon_back}"-->
 <!--                tools:navigationIcon="@drawable/icon_main_menu"-->
             </com.google.android.material.appbar.AppBarLayout>
@@ -92,6 +93,7 @@
             android:background="@color/white"
             android:orientation="vertical">
 
+
             <include
                 android:id="@+id/header"
                 layout="@layout/drawer_header"
@@ -99,7 +101,21 @@
             <include
                 android:id="@+id/person"
                 layout="@layout/drawer_person"
-                app:click="@{click}"/>
+                app:click="@{click}"
+                app:itemIcon="@{@drawable/icon_drawer_person}"
+                app:itemTitle="@{@string/person_info}" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/white"/>
+            <include
+                android:id="@+id/set"
+                layout="@layout/drawer_person"
+                app:click="@{click}"
+                app:itemIcon="@{@drawable/icon_drawer_set}"
+                app:itemTitle="@{@string/drawer_set_up}"/>
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -119,3 +135,44 @@
     </androidx.drawerlayout.widget.DrawerLayout>
 
 </layout>
+
+<!--    <?xml version="1.0" encoding="utf-8"?>-->
+<!--<menu xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--xmlns:app="http://schemas.android.com/apk/res-auto">-->
+
+<!--<item-->
+<!--    android:id="@+id/add"-->
+<!--    android:icon="@drawable/icon_add"-->
+<!--    android:title="@string/add"-->
+<!--    android:visible="false"-->
+<!--    app:showAsAction="ifRoom" />-->
+
+<!--<item-->
+<!--    android:id="@+id/edit"-->
+<!--    android:icon="@drawable/icon_edit"-->
+<!--    android:title="@string/edit"-->
+<!--    android:visible="false"-->
+<!--    app:showAsAction="ifRoom" />-->
+
+<!--<item-->
+<!--    android:id="@+id/done"-->
+<!--    android:icon="@drawable/icon_done"-->
+<!--    android:title="@string/done"-->
+<!--    android:visible="false"-->
+<!--    app:showAsAction="ifRoom" />-->
+
+<!--<item-->
+<!--    android:id="@+id/share"-->
+<!--    android:icon="@drawable/icon_share"-->
+<!--    android:title="@string/share"-->
+<!--    android:visible="false"-->
+<!--    app:showAsAction="ifRoom" />-->
+
+<!--<item-->
+<!--    android:id="@+id/display"-->
+<!--    android:icon="@drawable/icon_bulb"-->
+<!--    android:title="@string/directions"-->
+<!--    android:visible="false"-->
+<!--    app:showAsAction="ifRoom" />-->
+
+<!--</menu>  app:menu="@menu/main_menu"-->

@@ -53,4 +53,11 @@
         <item name="android:textColor">@color/selector_radio_switch_text_color_white</item>
     </style>
 
+
+    <style name="Widget.App.ActionMode" parent="Widget.AppCompat.ActionMode">
+        <item name="titleTextStyle">?attr/textAppearanceHeadline6</item>
+        <item name="subtitleTextStyle">?attr/textAppearanceSubtitle1</item>
+        <item name="background">@color/material_grey_900</item>
+    </style>
+
 </resources>

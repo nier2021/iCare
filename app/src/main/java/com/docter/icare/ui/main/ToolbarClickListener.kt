@@ -4,7 +4,7 @@ import android.app.Activity
 
 interface ToolbarClickListener {
     fun onBackClick(activity: Activity) = activity.onBackPressed()
-    fun onAddClick() {}
+    fun onExceptionClick() {}
     fun onEditClick() {}
     fun onDoneClick() {}
 }

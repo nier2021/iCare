@@ -7,10 +7,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.docter.icare.R
 import com.docter.icare.data.bleUtil.bleInterface.BleConnectListener
+import com.docter.icare.data.bleUtil.bleInterface.BleDataReceiveListener
 import com.docter.icare.data.bleUtil.bleInterface.BleScanCallback
+import com.docter.icare.data.entities.view.AccountInfo
 import com.docter.icare.data.entities.view.item.DeviceScanItemEntity
 import com.docter.icare.data.repositories.DeviceRepository
 import com.docter.icare.utils.Coroutines
+import com.docter.icare.utils.toHexStringSpace
 import com.xwray.groupie.GroupieAdapter
 import java.util.concurrent.TimeUnit
 import io.reactivex.rxjava3.core.Observable.timer
@@ -23,6 +26,11 @@ class DeviceScanViewModel(
     val isScan = MutableLiveData(false)
     val currentItem = MutableLiveData(DeviceScanItemEntity())
     val adapter = GroupieAdapter()
+    var accountInfo = AccountInfo()
+
+    fun getAccountInfo(){
+        accountInfo = deviceRepository.getAccountInfo()
+    }
 
     fun startScan()  {
         deviceScanData.clear()
@@ -49,8 +57,7 @@ class DeviceScanViewModel(
         }
 
         override fun onScanFinish() {
-            Log.i("DeviceScanViewModel","device Scan onScanFinish")
-//            isScan.postValue(false)
+//            Log.i("DeviceScanViewModel","device Scan onScanFinish")
             Coroutines.main {
                 with(adapter) {
                     clear()
@@ -69,14 +76,19 @@ class DeviceScanViewModel(
 
     fun bleDisconnect() = deviceRepository.bleDisconnect(deviceType.value!!)
 
-    //type=1 綁定 , = 0 解綁
+    //type:1->綁定, 0-> 解綁 ; deviceType:0->生物雷達, 1-> 空氣盒子
     suspend fun deviceBindingRequest(context: Context, device: BluetoothDevice?, type: Int)  = deviceRepository.deviceBindingRequest(context, device, type, deviceType.value!!)
 
     fun stopScan() = deviceRepository.stopScan(deviceType.value!!)
 
     fun isConnect() = deviceRepository.isConnect(deviceType.value!!)
 
+    fun wifiSetData() = deviceRepository.wifiSetData(deviceType.value!!,accountInfo)
+
     fun setAppendDistance() =  deviceRepository.setAppendDistance(1)
+
+
+
 
 
 

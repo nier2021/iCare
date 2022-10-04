@@ -250,7 +250,19 @@
 
     <string name="error_wifi_account_empty">wifi帳號不能為空</string>
     <string name="error_wifi_password_empty">wifi密碼不能為空</string>
-    <string name="error_wifi_length">wifi帳號或密碼只能小於20個字元(全中文不能超過7個字)</string>
+    <string name="error_wifi_length">wifi帳號或密碼只大於8個字元能小於20個字元(全中文不能超過7個字)</string>
     <string name="error_wifi_special_symbols">wifi帳號或密碼不能有特殊符號(ex:”或,等)</string>
+    <string name="error_wifi_acc_pass_incorrect">連接wifi失敗,名稱或密碼錯誤</string>
     <string name="error_login_acc_pass_incorrect">アカウントまたはパスワードが正しくありません</string>
+
+    <string name="unknown_error_occurred">不明なエラーが発生しました</string>
+    <string name="body_temperature">体温</string>
+    <string name="body_temperature_unit">℃</string>
+    <string name="device_connect_success">デバイスがサーバーに正常に接続されました。</string>
+    <string name="device_connect_fail">デバイスをサーバーに接続できません。</string>
+    <string name="device_connect_wifi_fail">デバイスが Wi-Fi に接続できません。</string>
+    <string name="device_failure">器具の不具合。</string>
+    <string name="drawer_set_up">構える</string>
+
+    <string name="exception_notification">例外通知</string>
 </resources>

@@ -55,8 +55,15 @@ interface ApiService {
         @Field("sid") sid: String,
         @Field("type") type: Int,
         @Field("serialNumber") serialNumber: String,
+        @Field("macAddress") macAddress: String,//未定,到時看小張命名啥
         @Field("deviceType") deviceType: Int
     ): Call<BindingDeviceResponse>
+
+    //連小張電腦
+    @GET("check-device")
+    fun checkDevice(
+        @Query("sid") sid: String
+    ):Call<CheckDeviceResponse>
 
 
 }

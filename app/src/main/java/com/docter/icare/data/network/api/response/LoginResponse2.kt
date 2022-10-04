@@ -7,6 +7,9 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class LoginResponse2(
 
+    @SerializedName("success")
+    val success: Int,
+
     @SerializedName("sid")
     val sid: String,
 

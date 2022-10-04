@@ -56,7 +56,7 @@ class ChooseBedTypeDialog(context: Context) {
             }
 
 
-            rgBedType.setOnCheckedChangeListener { group, checkedId ->
+            rgBedType.setOnCheckedChangeListener { _, checkedId ->
                 Log.i("ChooseBedTypeDialog","id=>$checkedId")
                 chooseBedType =  when (checkedId) {
                     R.id.cb_bed_type_2 -> 2
@@ -70,7 +70,9 @@ class ChooseBedTypeDialog(context: Context) {
     }
 
     fun saveBedType(saveBedType: Int){
+//        Log.i("ChooseBedTypeDialog","saveBedType=>$saveBedType")
         chooseBedType = saveBedType
+//        Log.i("ChooseBedTypeDialog","chooseBedType=>$chooseBedType")
         when (saveBedType) {
             2 -> binding.cbBedType2.isChecked = true
             3 -> binding.cbBedType3.isChecked = true

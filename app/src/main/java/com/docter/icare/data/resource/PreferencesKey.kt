@@ -24,5 +24,7 @@ const val WIFI_NAME ="wifiName"
 const val WIFI_PASS = "wifiPass"
 const val IS_WIFI ="isWifi"
 const val BED_TYPE = "bedType"
+const val RADAR = "Radar"
+const val AIR = "Air"
 
 

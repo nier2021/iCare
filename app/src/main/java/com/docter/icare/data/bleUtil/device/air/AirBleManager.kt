@@ -96,7 +96,7 @@ class AirBleManager constructor(private val context: Context) {
             super.onScanResult(callbackType, result)
 
             val name = result?.scanRecord?.deviceName ?: return
-            val mac = result?.device?.address ?: return
+            val mac = result.device?.address ?: return
 
             bleScanCallback?.onDeviceFound(
                 DeviceScanItemEntity(name, mac)

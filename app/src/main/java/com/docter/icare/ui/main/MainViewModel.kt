@@ -1,6 +1,7 @@
 package com.docter.icare.ui.main
 
 import android.content.Context
+import android.util.Log
 import android.view.MenuItem
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -47,12 +48,18 @@ class MainViewModel(
         toolbarClickListener = null
 
         main {
-//            entity.nowFragment.value = when (destination.id) {
-//                R.id.bedsideMonitorFragment -> MainEntity.BEDSIDE_MONITOR
-//                R.id.airQualityIndexFragment -> MainEntity.AIR_QUALITY_INDEX
-//                R.id.activityMonitoringFragment -> MainEntity.ACTIVITY_MONITORING
-//                else -> -1
-//            }
+            entity.nowFragment.value = when (destination.id) {
+                R.id.bedsideMonitorFragment -> MainEntity.BEDSIDE_MONITOR
+                R.id.airQualityIndexFragment -> MainEntity.AIR_QUALITY_INDEX
+                R.id.activityMonitoringFragment -> MainEntity.ACTIVITY_MONITORING
+                R.id.exceptionFragment -> MainEntity.EXCEPTION
+                R.id.deviceScanFragment ->  MainEntity.DEVICE_SCAN
+                R.id.deviceFragment -> MainEntity.DEVICE
+                R.id.personInfoContentFragment ->  MainEntity.PERSON_INFO_CONTENT
+                R.id.personInfoEditFragment -> MainEntity.PERSON_INFO_EDIT
+                else -> -1
+            }
+
             entity.isDrawerBottomViewShow.value = when (destination.id) {
                 R.id.bedsideMonitorFragment, R.id.airQualityIndexFragment,R.id.activityMonitoringFragment -> true
                 else -> false
@@ -60,14 +67,16 @@ class MainViewModel(
         }
     }
 
+    //設置右上角功能
     fun menuClick(
         item: MenuItem
     ) = when (item.itemId) {
 
-//        R.id.add -> {
-//            toolbarClickListener?.onAddClick()
-//            true
-//        }
+        R.id.exception -> {
+            Log.i("MainViewModel","menuClick exception")
+            toolbarClickListener?.onExceptionClick()
+            true
+        }
 //
 //        R.id.edit ->{
 //            toolbarClickListener?.onEditClick()
@@ -86,6 +95,25 @@ class MainViewModel(
 
         else -> false
     }
+
+    fun getShowIcon(): Int = when(entity.nowFragment.value){
+        MainEntity.BEDSIDE_MONITOR, MainEntity.AIR_QUALITY_INDEX,MainEntity.ACTIVITY_MONITORING -> 1 //有異常icon
+        MainEntity.PERSON_INFO_CONTENT -> 2// Edit icon
+        else -> -1 //無icon
+    }
+//    fun hasException(
+//        destination: NavDestination
+//    ) = when (destination.id) {
+//
+//        R.id.bedsideMonitorFragment,
+////        R.id.airQualityIndexFragment
+//        -> true
+//
+//        else -> false
+//    }
+
+    //取得後台登入帳號裝置狀態
+    suspend fun getAccountDeviceInfo() = withContext(Dispatchers.IO) {mainRepository.getAccountDeviceInfo()}
 
     //以下登出
     fun checkDevice(): DeviceInfoEntity?{

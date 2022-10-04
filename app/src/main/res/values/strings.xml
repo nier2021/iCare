@@ -250,7 +250,20 @@
 
     <string name="error_wifi_account_empty">wifi帳號不能為空</string>
     <string name="error_wifi_password_empty">wifi密碼不能為空</string>
-    <string name="error_wifi_length">wifi帳號或密碼只能小於20個字元(全中文不能超過7個字)</string>
+    <string name="error_wifi_length">wifi帳號或密碼小於20個字元(全中文不能超過7個字)</string>
     <string name="error_wifi_special_symbols">wifi帳號或密碼不能有特殊符號(ex:”或,等)</string>
+    <string name="error_wifi_acc_pass_incorrect">連接wifi失敗,名稱或密碼錯誤</string>
     <string name="error_login_acc_pass_incorrect">The account or password is incorrect</string>
+
+    <string name="unknown_error_occurred">An unknown error occurred</string>
+    <string name="body_temperature">Temperature</string>
+    <string name="body_temperature_unit">℃</string>
+    <string name="device_connect_success">The device has successfully connected to the server.</string>
+    <string name="device_connect_fail">Cannot connect the device to the server.</string>
+    <string name="device_connect_wifi_fail">Device Can not Connect to Wi-Fi.</string>
+    <string name="device_failure">Equipment failure.</string>
+    <string name="drawer_set_up">Set Up</string>
+
+    <string name="exception_notification">Exception Notification</string>
+
 </resources>

@@ -10,8 +10,8 @@
     <string name="register">註冊</string>
     <string name="enter_account">請輸入帳號</string>
     <string name="enter_password">請輸入密碼</string>
-    <string name="heart_rate">即時心率</string>
-    <string name="breath_frequency">呼吸頻率</string>
+    <string name="heart_rate">心率</string>
+    <string name="breath_frequency">呼吸</string>
     <string name="breath_frequency_unit">次/分</string>
     <string name="bed_state">狀態(在床/離床)</string>
     <string name="data_time">狀態時間</string>
@@ -251,8 +251,20 @@
 
     <string name="error_wifi_account_empty">wifi帳號不能為空</string>
     <string name="error_wifi_password_empty">wifi密碼不能為空</string>
-    <string name="error_wifi_length">wifi帳號或密碼只能小於20個字元(全中文不能超過7個字)</string>
+    <string name="error_wifi_length">wifi帳號或密碼只大於8個字元能小於20個字元(全中文不能超過7個字)</string>
     <string name="error_wifi_special_symbols">wifi帳號或密碼不能有特殊符號(ex:”或,等)</string>
+    <string name="error_wifi_acc_pass_incorrect">連接wifi失敗,名稱或密碼錯誤</string>
+
     <string name="error_login_acc_pass_incorrect">帳號或密碼錯誤</string>
 
+    <string name="unknown_error_occurred">未知錯誤</string>
+    <string name="body_temperature">體溫</string>
+    <string name="body_temperature_unit">℃</string>
+    <string name="device_connect_success">設備已成功連接到服務器。</string>
+    <string name="device_connect_fail">設備連接到服務器失敗。</string>
+    <string name="device_connect_wifi_fail">設備連接到Wi-Fi失敗。</string>
+    <string name="device_failure">裝置故障。</string>
+    <string name="drawer_set_up">功能設定</string>
+
+    <string name="exception_notification">異常通知</string>
 </resources>

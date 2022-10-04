@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ExpandableListView
@@ -22,8 +23,10 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.GravityCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.ui.navigateUp
 import com.docter.icare.data.entities.device.DeviceInfoEntity
 import com.docter.icare.data.entities.view.ExpandableListEntity
 import com.docter.icare.data.entities.view.MainEntity
@@ -83,19 +86,25 @@ class MainActivity : BaseActivity() {
 //                setOnGroupExpandListener(expandableListViewOnGroupExpandListener)
 //                setOnGroupCollapseListener(expandableListViewOnGroupCollapseListener)
             }
+
+
         }
 
-        fragment.navController.addOnDestinationChangedListener { _, destination, bundle ->
+        //取得後台登入帳號裝置狀態
+        getAccountDeviceInfo()
+
+        fragment.navController.addOnDestinationChangedListener { _, destination, _ ->
 
             viewModel.destinationChange(destination)
 
 //            with(binding.toolbar.menu) {
-//                getItem(0).isVisible = viewModel.hasAdd(destination)
-//                getItem(1).isVisible = viewModel.hasEdit(destination)
-//                getItem(2).isVisible = viewModel.hasDone(destination)
-//                getItem(3).isVisible = viewModel.hasShare(destination)
+//                getItem(0).isVisible = viewModel.hasException(destination)
+//                getItem(1).isVisible = viewModel.hasDone(destination)
+////                getItem(2).isVisible = viewModel.hasDone(destination)
+////                getItem(3).isVisible = viewModel.hasShare(destination)
 //            }
         }
+
 
         //底部導航與標題
         bottomNavView = binding.bottomNavigation
@@ -112,40 +121,44 @@ class MainActivity : BaseActivity() {
         //開啟側欄
         with(toolbar) {
             setNavigationOnClickListener {
-//                Log.i("MainActivity","toolbar setNavigationOnClickListener")
+                Log.i("MainActivity","toolbar setNavigationOnClickListener")
                 navigationClick()
             }
             setOnMenuItemClickListener {
-//                Log.i("MainActivity","toolbar setOnMenuItemClickListener")
+                Log.i("MainActivity","toolbar setOnMenuItemClickListener")
                 viewModel.menuClick(it)
             }
         }
     }
 
-    private var bottomNavListener = BottomNavigationView.OnNavigationItemSelectedListener {
+    private var bottomNavListener = NavigationBarView.OnItemSelectedListener {
+//    private var bottomNavListener = BottomNavigationView.OnNavigationItemSelectedListener {//已被棄用
 //        Log.i("MainActivity","itemId=>${it.itemId}")
         when (it.itemId) {
 
             R.id.nav_air_quality_index ->{
 //                Log.i("MainActivity","airQualityIndexFragment")
-//                navController.navigate(R.id.airQualityIndexFragment)//等做完再開啟
-                this@MainActivity.toast("尚未開放")
-                false
+                navController.navigate(R.id.airQualityIndexFragment)//等做完再開啟
+//                this@MainActivity.toast("尚未開放")
+                true//等做完再開啟
+//                false
+
             }
             R.id.nav_activity_monitoring -> {
-                R.id.nav_activity_monitoring
 //                Log.i("MainActivity","activityMonitoringFragment")
 //                navController.navigate(R.id.activityMonitoringFragment)//等做完再開啟
-                this@MainActivity.toast("尚未開放")
+//                this@MainActivity.toast("尚未開放")
+//                true//等做完再開啟
                 false
             }
             else -> {
                 //以上等做完再開啟
 //                 R.id.nav_bedside_monitor
 //                Log.i("MainActivity","bedsideMonitorFragment")
-                navController.navigate(R.id.bedsideMonitorFragment)
+//                navController.navigate(R.id.bedsideMonitorFragment)
 //                binding.toolbar.setBackgroundColor(ContextCompat.getColor(this,R.color.welcome_status_bar))
-                true
+//                true
+                false
             }
         }
 //        false
@@ -159,8 +172,11 @@ class MainActivity : BaseActivity() {
         when(view){
             binding.person.root ->{
 //                this@MainActivity.toast("個人資訊")
+//                navController.navigate(R.id.personInfoContentFragment,bundleOf("deviceType" to "Radar"))
                 this@MainActivity.toast("尚未開放")
             }
+            binding.set.root -> this@MainActivity.toast("尚未開放")
+//                this@MainActivity.toast("功能設定")
         }
     }
 
@@ -198,7 +214,7 @@ class MainActivity : BaseActivity() {
                     navController.navigate(R.id.device_navigation,bundleOf("deviceType" to "Radar"))
                 }
 //以下等做完再開啟
-//                groupPosition == 0 && childPosition == 1 -> this@MainActivity.toast("空氣品質")
+//                groupPosition == 0 && childPosition == 1 ->  navController.navigate(R.id.device_navigation,bundleOf("deviceType" to "Air"))
 //                groupPosition == 0 && childPosition == 2 -> this@MainActivity.toast("姿態感知")//除了姿態感知 睡眠感知與空氣品質裝置都寫在一起
 //                groupPosition == 1 && childPosition == 0 -> this@MainActivity.toast("關於")
 //                groupPosition == 1 && childPosition == 1 -> this@MainActivity.toast("隱私權政策")
@@ -295,5 +311,47 @@ class MainActivity : BaseActivity() {
         }
 
     }
+
+
+    //取得後台登入帳號裝置狀態
+    fun getAccountDeviceInfo(){
+        Log.i("MainActivity","getAccountDeviceInfo")
+        lifecycleScope.launch {
+            runCatching {
+                viewModel.getAccountDeviceInfo()
+            }.onSuccess {
+                Log.i("MainActivity","getAccountDeviceInfo onSuccess getDeviceList=>$it")
+//                if (it[0].deviceType == 1)   Log.i("MainActivity","it[0].deviceType == 1") else  Log.i("MainActivity","it[0].deviceType != 1")
+            }.onFailure {
+                Log.i("MainActivity","getAccountDeviceInfo onFailure e=>${it.message}")
+                it.printStackTrace()
+                binding.root.snackbar(it)
+            }
+        }
+    }
+
+    //設定右上異常通知顯示
+//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//        menuInflater.inflate(R.menu.top_menu, menu)
+//        return super.onCreateOptionsMenu(menu)
+//    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.top_menu, menu)
+        super.onCreateOptionsMenu(menu)
+        return when(viewModel.getShowIcon()){
+            1 -> {
+                menu?.getItem(0)?.isVisible = true
+                true
+            }
+            2 -> {
+                menu?.getItem(1)?.isVisible = true
+                true
+            }
+            else -> true
+        }
+    }
+
+
 
 }

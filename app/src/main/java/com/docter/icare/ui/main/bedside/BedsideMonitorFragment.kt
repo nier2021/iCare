@@ -5,14 +5,18 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.docter.icare.R
 import com.docter.icare.databinding.FragmentBedsideMonitorBinding
 import com.docter.icare.ui.base.BaseFragment
 import com.docter.icare.ui.main.MainViewModel
+import com.docter.icare.ui.main.ToolbarClickListener
 import com.docter.icare.utils.snackbar
 import com.docter.icare.utils.toast
 import com.docter.icare.view.dialog.CustomAlertDialog
@@ -61,6 +65,8 @@ class BedsideMonitorFragment : BaseFragment() {
             }
         }
 
+        setHasOptionsMenu(true)//設置右上角(Fragment)
+        activityViewModel.toolbarClickListener = toolbarClickListener
 
         return binding.root
     }
@@ -163,7 +169,7 @@ class BedsideMonitorFragment : BaseFragment() {
     private fun restConnect(){
         Log.i("BedsideMonitorFragment","restConnect")
         if (!restConnectWebServicesDialog.isShowing()) restConnectWebServicesDialog.apply {
-            setPositiveButton(R.string.yes_text){ v->
+            setPositiveButton(R.string.yes_text){ _->
                 connectProgressDialog.show()
                 viewModel.getDeviceAccountId().let {
                     if (it.isNotEmpty()){
@@ -176,6 +182,13 @@ class BedsideMonitorFragment : BaseFragment() {
                 }
             }
         }.show()
+    }
+
+    private val toolbarClickListener = object : ToolbarClickListener {
+        override fun onExceptionClick() {
+            super.onExceptionClick()
+            Log.i("BedsideMonitorFragment","onExceptionClick go to Exception")
+        }
     }
 
 }

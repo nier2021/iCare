@@ -36,7 +36,9 @@ class LoginRepository (
 
     suspend fun login(
         entity: LoginEntity
-    ) = apiRequest { api.login(entity.account, entity.password) }
+    ):LoginResponse2 = apiRequest { api.login(entity.account, entity.password) }.let {
+        if (it.success == 1) return it else throw Exception(it.message)
+    }
 
     fun save(entity: LoginEntity,data: LoginResponse2){
         if (data.sid.isNotBlank()) {

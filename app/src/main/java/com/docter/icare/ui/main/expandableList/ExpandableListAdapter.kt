@@ -12,7 +12,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import com.docter.icare.R
 import com.docter.icare.data.entities.view.ExpandableListEntity
-import com.docter.icare.databinding.DraweGrouprListBinding
+import com.docter.icare.databinding.DrawerGrouprListBinding
 import com.docter.icare.databinding.DrawerItemListBinding
 
 class ExpandableListAdapter internal constructor(
@@ -21,7 +21,7 @@ class ExpandableListAdapter internal constructor(
 ) : BaseExpandableListAdapter() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-    private lateinit var groupBinding: DraweGrouprListBinding
+    private lateinit var groupBinding: DrawerGrouprListBinding
     private lateinit var itemBinding: DrawerItemListBinding
 
     override fun getChild(listPosition: Int, expandedListPosition: Int): Any {
@@ -69,7 +69,7 @@ class ExpandableListAdapter internal constructor(
         var convertView = view
         val holder: GroupViewHolder
         if (convertView == null) {
-            groupBinding = DraweGrouprListBinding.inflate(inflater)
+            groupBinding = DrawerGrouprListBinding.inflate(inflater)
             convertView = groupBinding.root
             holder = GroupViewHolder()
             with(holder){

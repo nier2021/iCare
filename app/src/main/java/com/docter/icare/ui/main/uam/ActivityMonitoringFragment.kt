@@ -8,10 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.docter.icare.R
 import com.docter.icare.databinding.FragmentActivityMonitoringBinding
 import com.docter.icare.ui.base.BaseFragment
+import com.docter.icare.ui.main.MainViewModel
+import com.docter.icare.ui.main.ToolbarClickListener
 import com.docter.icare.utils.snackbar
 import com.docter.icare.view.dialog.CustomAlertDialog
 import com.docter.icare.view.dialog.CustomProgressDialog
@@ -27,6 +30,8 @@ class ActivityMonitoringFragment : BaseFragment() {
 
     private val factory: ActivityMonitoringViewModelFactory by instance()
     private val viewModel: ActivityMonitoringViewModel by lazy { ViewModelProvider(this, factory)[ActivityMonitoringViewModel::class.java] }
+
+    private val activityViewModel: MainViewModel by lazy { ViewModelProvider(requireActivity())[MainViewModel::class.java] }
 
     private val restConnectWebServicesDialog: CustomAlertDialog by lazy {
         CustomAlertDialog(requireActivity())
@@ -60,6 +65,10 @@ class ActivityMonitoringFragment : BaseFragment() {
                 }
             }
         }
+
+        setHasOptionsMenu(true)//設置右上角(Fragment)
+        activityViewModel.toolbarClickListener = toolbarClickListener
+
         return binding.root
     }
 
@@ -123,7 +132,7 @@ class ActivityMonitoringFragment : BaseFragment() {
     private fun restConnect(){
         Log.i("ActivityMonitoringFragment","restConnect")
         if (!restConnectWebServicesDialog.isShowing()) restConnectWebServicesDialog.apply {
-            setPositiveButton(R.string.yes_text){ v->
+            setPositiveButton(R.string.yes_text){ _->
                 connectProgressDialog.show()
                 viewModel.getDeviceAccountId().let {
                     if (it.isNotEmpty()){
@@ -138,5 +147,10 @@ class ActivityMonitoringFragment : BaseFragment() {
         }.show()
     }
 
-
+    private val toolbarClickListener = object : ToolbarClickListener{
+        override fun onExceptionClick() {
+            super.onExceptionClick()
+            Log.i("ActivityMonitoringFragment","onExceptionClick go to Exception")
+        }
+    }
 }

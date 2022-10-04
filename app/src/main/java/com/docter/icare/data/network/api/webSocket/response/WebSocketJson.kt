@@ -70,6 +70,7 @@ data class RadarInfoStatus2(
     val heart_rate: String,
     val bed_state: String,
     val breath_state: String,
+    val temperature: String
 )
 
 data class RadarInfoEntity(

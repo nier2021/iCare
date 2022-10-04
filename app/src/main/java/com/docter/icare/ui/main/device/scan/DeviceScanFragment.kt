@@ -30,6 +30,7 @@ import com.docter.icare.utils.toast
 import com.docter.icare.view.RecyclerDivider
 import com.docter.icare.view.dialog.CustomAlertDialog
 import com.docter.icare.view.dialog.CustomProgressDialog
+import com.docter.icare.view.dialog.ToastAlertDialog
 import io.reactivex.rxjava3.core.Observable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,7 +51,7 @@ class DeviceScanFragment : BaseFragment() {
 
     private val scanProgressDialog: CustomProgressDialog by lazy { CustomProgressDialog(requireActivity(), R.string.scanning_text) }
 
-    private val connectProgressDialog: CustomProgressDialog by lazy { CustomProgressDialog(requireActivity(), R.string.connecting) }
+    private val connectProgressDialog: CustomProgressDialog by lazy { CustomProgressDialog( requireActivity(), R.string.connecting) }
 
     private val confirmBindDeviceDialog: CustomAlertDialog by lazy {
         CustomAlertDialog(requireActivity())
@@ -59,6 +60,8 @@ class DeviceScanFragment : BaseFragment() {
             .setPositiveButton(R.string.yes_text)
             .setNegativeButton(R.string.no_text)
     }
+
+    private val toastAlertDialog: ToastAlertDialog by lazy { ToastAlertDialog(requireContext()) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -81,6 +84,7 @@ class DeviceScanFragment : BaseFragment() {
             }
         }
         with(viewModel){
+            getAccountInfo()
             isScan.observe(viewLifecycleOwner){
                 if (it){
                     scanProgressDialog.show()
@@ -91,7 +95,7 @@ class DeviceScanFragment : BaseFragment() {
                     Log.i("DeviceScanFragment","currentItem name=>${it.name} \n mac=>${it.mac}")
                     if (!confirmBindDeviceDialog.isShowing()) confirmBindDeviceDialog.apply {
                         setMessage(getString(R.string.confirm_bind_device_message,it.name))
-                        setPositiveButton(R.string.yes_text){ v->
+                        setPositiveButton(R.string.yes_text){ _->
                             main {  connectProgressDialog.show() }
                             viewModel.bleConnect(it.mac,bleConnectListener)
                         }
@@ -99,6 +103,7 @@ class DeviceScanFragment : BaseFragment() {
                 }
             }
         }
+
 
         return binding.root
     }
@@ -147,15 +152,15 @@ class DeviceScanFragment : BaseFragment() {
                 viewModel.deviceBindingRequest(requireContext(), device, 1)
             }.onSuccess {
 //                Log.i("DeviceScanViewModel","deviceBindingRequest bind_success")
-                viewModel.isConnect()
-                setAppendDistance()
-//                main {
-//                    viewModel.bleDisconnect()
-//                    requireActivity().onBackPressed()
-//                }
+               val isConnect: Boolean = viewModel.isConnect()
+                if (isConnect) wifiSetData()
+                else{
+                    main { connectProgressDialog.dismiss() }
+                    binding.root.snackbar(R.string.failed_connect_device)
+                }
             }.onFailure {
 //                Log.i("DeviceScanViewModel","deviceBindingRequest bind_Failure")
-                connectProgressDialog.dismiss()
+                main { connectProgressDialog.dismiss() }
                 it.printStackTrace()
                 binding.root.snackbar(it)
             }
@@ -175,11 +180,29 @@ class DeviceScanFragment : BaseFragment() {
     private fun stop(){
         main {
             scanProgressDialog.dismiss()
-            connectProgressDialog.dismiss()
+//            connectProgressDialog.dismiss()
         }
         with(viewModel){
             stopScan()
 //            bleDisconnect()
+        }
+    }
+
+    private fun wifiSetData(){
+        runCatching {
+            viewModel.wifiSetData()
+        }.onSuccess {
+            if (viewModel.deviceType.value == "Radar" ) setAppendDistance()
+            else {
+                main { connectProgressDialog.dismiss() }
+                //未來看空氣盒子或姿態感知要做啥(沒有=> connectProgressDialog.dismiss()
+                //                binding.root.snackbar(R.string.bind_success)
+                //                requireActivity().onBackPressed())
+            }
+        }.onFailure {
+            main { connectProgressDialog.dismiss() }
+            it.printStackTrace()
+            binding.root.snackbar(R.string.bind_failed)
         }
     }
 
@@ -190,20 +213,24 @@ class DeviceScanFragment : BaseFragment() {
             main {
 //                viewModel.bleDisconnect()
                 connectProgressDialog.dismiss()
-                binding.root.snackbar(R.string.bind_success)
-                requireActivity().onBackPressed()
+                toastAlertDialog.apply {
+                    setMessage(getString(R.string.bind_success))
+                    setButton(){
+                        requireActivity().onBackPressed()
+                    }
+                }.show()
+//                binding.root.snackbar(R.string.bind_success)
+//
             }
         }.onFailure {
-
-//            requireContext().toast("床型設定發生錯誤")
             it.printStackTrace()
             main {
                 connectProgressDialog.dismiss()
-//                viewModel.bleDisconnect()
-                binding.root.snackbar(it)
+                binding.root.snackbar(R.string.bind_failed)
                 requireActivity().onBackPressed()
             }
         }
     }
+
 
 }

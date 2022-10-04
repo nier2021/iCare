@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/drawerGroupColor"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    tools:context=".ui.main.expandableList.ExpandableListAdapter">
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivIcon"
         android:layout_width="match_parent"
