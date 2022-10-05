@@ -149,7 +149,7 @@ class DeviceScanFragment : BaseFragment() {
 //        Log.i("DeviceScanViewModel","deviceBindingRequest")
         withContext(Dispatchers.IO) {
             runCatching {
-                viewModel.deviceBindingRequest(requireContext(), device, 1)
+                viewModel.deviceBindingRequest(context!!.applicationContext, device, 1)
             }.onSuccess {
 //                Log.i("DeviceScanViewModel","deviceBindingRequest bind_success")
                val isConnect: Boolean = viewModel.isConnect()

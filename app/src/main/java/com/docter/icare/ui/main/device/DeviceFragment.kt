@@ -1,24 +1,23 @@
 package com.docter.icare.ui.main.device
 
 import android.app.Activity
-import android.bluetooth.BluetoothDevice
 import android.content.Context
-import android.net.*
-import android.net.wifi.WifiNetworkSpecifier
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
+import android.net.wifi.WifiConfiguration
+import android.net.wifi.WifiManager
 import android.os.Build
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import android.os.PatternMatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.docter.icare.R
-import com.docter.icare.data.bleUtil.bleInterface.BleConnectListener
 import com.docter.icare.data.entities.device.ToastAlertEntity
 import com.docter.icare.databinding.FragmentDeviceBinding
 import com.docter.icare.ui.base.BaseFragment
@@ -32,6 +31,7 @@ import com.docter.icare.view.dialog.*
 import kotlinx.coroutines.launch
 import org.kodein.di.android.x.closestDI
 import org.kodein.di.instance
+
 
 class DeviceFragment : BaseFragment() {
 
@@ -266,7 +266,13 @@ class DeviceFragment : BaseFragment() {
 
     private fun connectToWifi(ssid: String, password:String){
         main {
-            WfiCheckUtils(context = requireContext(),wfiCheckUtilsCallBack = wfiCheckUtilsCallBack).connectToWifi(ssid = ssid, password = password)
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                Log.i("DeviceFragment","connectToWifi < Build.VERSION_CODES.Q")
+                context?.toast("請用android 10以上版本")
+            } else {
+                WfiCheckUtils(context = requireContext(),wfiCheckUtilsCallBack = wfiCheckUtilsCallBack).connectToWifi(ssid = ssid, password = password)
+            }
+
         }
     }
 

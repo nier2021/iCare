@@ -16,7 +16,7 @@ import okhttp3.WebSocket
 import okio.ByteString
 
 //@ExperimentalCoroutinesApi
-class LinkWebSocketListener(context: Context, accountId: String) : WebSocketListener() {
+class LinkWebSocketListener(context: Context, accountId: Int) : WebSocketListener() {
     val socketEventChannel: Channel<SocketUpdate> = Channel(10)
     private var linkFlag: Int = -1
     private var pushId = accountId

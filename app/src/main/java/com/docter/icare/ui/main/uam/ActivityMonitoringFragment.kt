@@ -57,7 +57,7 @@ class ActivityMonitoringFragment : BaseFragment() {
             entity = viewModel.entity
             viewModel.getDeviceAccountId().let {
                 Log.i("ActivityMonitoringFragment","getDeviceAccountId=>$it")
-                if (it.isNotEmpty()){
+                if (it != -1){
                     binding.contentTv.text ="已開啟"
                     connectionWebSocket(it)
                 }else{
@@ -83,7 +83,7 @@ class ActivityMonitoringFragment : BaseFragment() {
         }
     }
 
-    private fun connectionWebSocket(accountId: String){
+    private fun connectionWebSocket(accountId: Int){
 //        //後端傳送4狀態正躺 側躺 坐在床邊 離床
 //        //狀態顏色&&圖片 在床&&側躺＆＆ 藍色 圖相同 值：狀態顯示文字不同 ; 離床&&無人：顏色＝>灰色 圖不同 無值--(直接顯示不管是否有收到呼吸等值);
         lifecycleScope.launch {
@@ -135,7 +135,7 @@ class ActivityMonitoringFragment : BaseFragment() {
             setPositiveButton(R.string.yes_text){ _->
                 connectProgressDialog.show()
                 viewModel.getDeviceAccountId().let {
-                    if (it.isNotEmpty()){
+                    if (it != -1){
                         connectProgressDialog.dismiss()
                         connectionWebSocket(it)
                     }else{

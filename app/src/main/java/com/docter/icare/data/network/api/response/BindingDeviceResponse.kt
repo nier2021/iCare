@@ -25,5 +25,5 @@ data class BindingDeviceResponse(
 //    val deviceType: String,
 
     @SerializedName("id")
-    val accountId: String
+    val accountId: Int
 ): Parcelable

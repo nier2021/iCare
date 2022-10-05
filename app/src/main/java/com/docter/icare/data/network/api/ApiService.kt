@@ -55,7 +55,7 @@ interface ApiService {
         @Field("sid") sid: String,
         @Field("type") type: Int,
         @Field("serialNumber") serialNumber: String,
-        @Field("macAddress") macAddress: String,//未定,到時看小張命名啥
+        @Field("deviceMac") macAddress: String,
         @Field("deviceType") deviceType: Int
     ): Call<BindingDeviceResponse>
 

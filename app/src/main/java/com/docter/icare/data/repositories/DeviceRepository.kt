@@ -110,7 +110,7 @@ class DeviceRepository (
 //                    preference.set(BED_TYPE,1)
                 } else {
                     Log.i("DeviceRepository","deviceBindingRequest bind success type==0")
-                    saveDevice(type, deviceType,"","" , "")
+                    saveDevice(type, deviceType,"","" , -1)
 //                    preference.set(BED_TYPE,-1)
                 }
             }else{
@@ -127,7 +127,7 @@ class DeviceRepository (
 
     fun bleDisconnect(deviceType: String) = if (deviceType == "Radar") radarBleDataManager.disconnect() else airBleDataManager.disconnect()
 
-    private fun saveDevice(type: Int,deviceType: String, deviceAddress: String, deviceName: String, accountId: String){
+    private fun saveDevice(type: Int,deviceType: String, deviceAddress: String, deviceName: String, accountId: Int){
         if (deviceType == "Radar") {
             Log.i("DeviceRepository","saveDevice deviceName=>$deviceName")
             with(preference){
@@ -150,20 +150,20 @@ class DeviceRepository (
         if (deviceEntity.deviceType == "Radar"){
             deviceEntity.type.value = DeviceEntity.RADAR
             with(preference){
-                deviceEntity.deviceMac = getString(RADAR_DEVICE_MAC)
-                deviceEntity.deviceName = getString(RADAR_DEVICE_NAME,)
+                deviceEntity.deviceMac = getString(RADAR_DEVICE_MAC,"")
+                deviceEntity.deviceName = getString(RADAR_DEVICE_NAME,"")
 //                Log.i("DeviceRepository","getDeviceInfo name=>${deviceEntity.deviceName}")
-                deviceEntity.wifiAccount.value = getString(WIFI_NAME)
-                deviceEntity.wifiPassword = getString(WIFI_PASS)
+                deviceEntity.wifiAccount.value = getString(WIFI_NAME,"")
+                deviceEntity.wifiPassword = getString(WIFI_PASS,"")
                 deviceEntity.bedType = getInt(BED_TYPE,-1)
             }
         }else{
             deviceEntity.type.value = DeviceEntity.AIR
             with(preference){
-                deviceEntity.deviceMac =  getString(AIR_DEVICE_MAC)
-                deviceEntity.deviceName = getString(AIR_DEVICE_NAME)
-                deviceEntity.wifiAccount.value = getString(WIFI_NAME)
-                deviceEntity.wifiPassword = getString(WIFI_PASS)
+                deviceEntity.deviceMac =  getString(AIR_DEVICE_MAC,"")
+                deviceEntity.deviceName = getString(AIR_DEVICE_NAME,"")
+                deviceEntity.wifiAccount.value = getString(WIFI_NAME,"")
+                deviceEntity.wifiPassword = getString(WIFI_PASS,"")
             }
         }
         return deviceEntity

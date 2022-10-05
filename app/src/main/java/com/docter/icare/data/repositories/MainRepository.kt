@@ -135,21 +135,22 @@ class MainRepository(
 
     suspend fun getAccountDeviceInfo():MutableList<CheckDeviceResponse.DeviceInfo> = apiRequest{
         Log.i("DeviceRepository","getAccountDeviceInfo")
-//        api.checkDevice(preference.getString(SID))
-        api.checkDevice("hueuan4")
+        api.checkDevice(preference.getString(SID))
+//        api.checkDevice("hueuan4")
     }.let { res ->
         if (res.success == 1){
             Log.i("DeviceRepository","getAccountDeviceInfo success data=>${res.data}")
             if (res.data.isNotEmpty()){
-//                getDeviceInfoList.forEach { saveDevice(it) }
+                //deviceType 0:ra  1:air
                 setDevice(0,res.data.firstOrNull { it.deviceType == 0 })
                 setDevice(1,res.data.firstOrNull { it.deviceType == 1 })
-                //感知器會有多台 無法使用first 假如deviceType是4
+                //感知器會有多台 無法使用first 假如deviceType是4?
                 val getActivityDeviceList: MutableList<CheckDeviceResponse.DeviceInfo> = mutableListOf()
                 res.data.map { if (it.deviceType == 4) getActivityDeviceList.add(it) }
                 if (getActivityDeviceList.isNotEmpty()) getActivityDeviceList.map { Log.i("DeviceRepository","看如何新增多台紀錄 db?") } else Log.i("DeviceRepository","看如何移除多台紀錄 db?")
             }else{
                 //表示無裝置
+                Log.i("DeviceRepository","getAccountDeviceInfo 無裝置")
                 allClean()
             }
 
@@ -164,6 +165,26 @@ class MainRepository(
         when (deviceType){
             0 ->{
                 if (device != null ){
+                    Log.i("DeviceRepository","save radar")
+                    Log.i("DeviceRepository","save radar serialNumber=>${device.serialNumber} \n macAddress=>${device.macAddress} \n accountId=>${device.accountId} ")
+                    with(preference){
+                        set(RADAR_DEVICE_NAME, device.serialNumber)
+                        set(RADAR_DEVICE_MAC, device.macAddress)
+                        set(RADAR_DEVICE_ACCOUNT_ID,device.accountId)
+                        if (getInt(BED_TYPE,-1) == -1) set(BED_TYPE,1)
+                    }
+                }else{
+                    Log.i("DeviceRepository","remove radar")
+                    with(preference){
+                        set(RADAR_DEVICE_MAC, "")
+                        set(RADAR_DEVICE_NAME, "")
+                        set(RADAR_DEVICE_ACCOUNT_ID,"")
+                        set(BED_TYPE,-1)
+                    }
+                }
+            }
+            1 ->{
+                if (device != null ){
                     Log.i("DeviceRepository","save air")
 //                    with(preference){
 //                        set(AIR_DEVICE_NAME, device.serialNumber)
@@ -176,25 +197,6 @@ class MainRepository(
 //                        set(AIR_DEVICE_NAME, "")
 //                        set(AIR_DEVICE_MAC,"")
 //                        set(AIR_DEVICE_ACCOUNT_ID,"")
-//                    }
-                }
-            }
-            1 ->{
-                if (device != null ){
-                    Log.i("DeviceRepository","save radar")
-//                    with(preference){
-//                        set(RADAR_DEVICE_NAME, device.serialNumber)
-//                        set(RADAR_DEVICE_MAC, device.macAddress)
-//                        set(RADAR_DEVICE_ACCOUNT_ID,device.accountId)
-//                        set(BED_TYPE,1)
-//                    }
-                }else{
-                    Log.i("DeviceRepository","remove radar")
-//                    with(preference){
-//                        set(RADAR_DEVICE_MAC, "")
-//                        set(RADAR_DEVICE_NAME, "")
-//                        set(RADAR_DEVICE_ACCOUNT_ID,"")
-//                        set(BED_TYPE,-1)
 //                    }
                 }
             }

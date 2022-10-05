@@ -25,7 +25,7 @@ data class CheckDeviceResponse(
         @SerializedName("device_type")
         val deviceType: Int,
 
-        @SerializedName("mac_address")//未定,到時看小張命名啥
+        @SerializedName("device_mac")
         val macAddress: String ,
 
         @SerializedName("accountId")

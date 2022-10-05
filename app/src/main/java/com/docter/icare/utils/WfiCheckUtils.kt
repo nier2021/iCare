@@ -4,8 +4,6 @@ import android.content.Context
 import android.net.*
 import android.net.wifi.WifiNetworkSpecifier
 import android.util.Log
-import io.reactivex.rxjava3.core.Observable
-import java.util.concurrent.TimeUnit
 
 
 class WfiCheckUtils(

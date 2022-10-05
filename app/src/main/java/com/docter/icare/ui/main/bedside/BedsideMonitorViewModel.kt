@@ -29,7 +29,7 @@ class BedsideMonitorViewModel(
 
     fun stopSocket() = radarRepository.closeSocket()
 
-    fun startSocket(context: Context ,accountId: String): Channel<SocketUpdate> =
+    fun startSocket(context: Context ,accountId: Int): Channel<SocketUpdate> =
         radarRepository.startSocket(context,accountId)
 
     fun socketData(context: Context, data: SocketUpdate) {
@@ -57,15 +57,15 @@ class BedsideMonitorViewModel(
                             breathState.value = data.bioRadar.breath_state
                             breathStateTextColor.value = ContextCompat.getColor(context, R.color.radar_side_bed_color)
                             //呼吸頻率icon與文字顏色判斷等後端送上下限值在做
-                            bodyTemperature.value =  data.bioRadar.temperature
+                            bodyTemperature.value = if (data.bioRadar.temperature.isNotBlank()) String.format("%.1f", data.bioRadar.temperature.toFloat()) else ""
 //                            bodyTemperature.value = getRandomBt()
                             if (bodyTemperature.value?.isNotBlank() == true) {
-                                when(bodyTemperature.value!!.toInt()) {
-                                    -1 ->{
+                                when(bodyTemperature.value!!.toFloat()) {//傳過來小數兩位 顯示小數一位 並重心排版
+                                    -1f ->{
                                         bodyTemperatureTextColor.value = ContextCompat.getColor(context, R.color.radar_out_bed_color)
                                         iconBodyTemperature.value =  ContextCompat.getDrawable(context, R.drawable.icon_body_temperature_blue)
                                     }
-                                    in 35..38 -> {
+                                    in 35f..38f -> {
                                         bodyTemperatureTextColor.value = ContextCompat.getColor(context, R.color.radar_side_bed_color)
                                         iconBodyTemperature.value =  ContextCompat.getDrawable(context, R.drawable.icon_body_temperature_blue)
                                     }

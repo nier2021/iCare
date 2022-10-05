@@ -59,7 +59,7 @@ class DeviceViewModel(
 //               if (it.wifiAccount.value?.isNotEmpty() == true) wifiAccount.value = it.wifiAccount.value
 //               if (it.wifiPassword.value?.isNotEmpty() == true) wifiPassword.value = it.wifiPassword.value
                Log.i("DeviceViewModel","entity deviceName=>$deviceName")
-               Log.i("DeviceViewModel","entity wifiAccount=>$wifiAccount")
+               Log.i("DeviceViewModel","entity wifiAccount=>${wifiAccount.value}")
                Log.i("DeviceViewModel","entity wifiPassword=>$wifiPassword")
 //               Log.i("DeviceViewModel","wifiAccount=>${it.wifiAccount.value}")
 //               Log.i("DeviceViewModel","wifiPassword=>${it.wifiPassword.value}")

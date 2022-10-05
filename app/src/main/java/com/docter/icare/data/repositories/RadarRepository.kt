@@ -16,10 +16,10 @@ class RadarRepository (
     private val webServices: WebServices
 ) : SafeApiRequest(resource) {
 
-    fun getDeviceAccountId() = preference.getString(RADAR_DEVICE_ACCOUNT_ID)
+    fun getDeviceAccountId() = preference.getInt(RADAR_DEVICE_ACCOUNT_ID,-1)
 
     //    @ExperimentalCoroutinesApi
-    fun startSocket(context: Context, accountId: String): Channel<SocketUpdate> =
+    fun startSocket(context: Context, accountId: Int): Channel<SocketUpdate> =
         webServices.startSocket( context,accountId)
 
     //    @ExperimentalCoroutinesApi

@@ -30,6 +30,9 @@ class WelcomeRepository (
         ACCESS_WIFI_STATE,
         CHANGE_NETWORK_STATE,
 //        WRITE_SETTINGS
+        BLUETOOTH_SCAN,
+        BLUETOOTH_CONNECT,
+        BLUETOOTH_ADVERTISE
 
     )
     //未來有需求改變
@@ -43,6 +46,7 @@ class WelcomeRepository (
         BLUETOOTH_CONNECT,
         ACCESS_WIFI_STATE,
         CHANGE_NETWORK_STATE,
+        BLUETOOTH_ADVERTISE
 //        WRITE_SETTINGS
     )
 
