@@ -91,7 +91,7 @@ class MainActivity : BaseActivity() {
         }
 
         //取得後台登入帳號裝置狀態
-//        getAccountDeviceInfo()
+        getAccountDeviceInfo()
 
         fragment.navController.addOnDestinationChangedListener { _, destination, _ ->
 

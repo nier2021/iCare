@@ -35,7 +35,7 @@ class WfiCheckUtils(
         connectivityManager =
             appContext.applicationContext!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-        connectivityManager?.registerNetworkCallback(networkRequest,networkCallback )
+        connectivityManager?.registerNetworkCallback(networkRequest,networkCallback)
         connectivityManager?.requestNetwork(networkRequest, networkCallback)
     }
 

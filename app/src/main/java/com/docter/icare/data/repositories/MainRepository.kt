@@ -186,18 +186,18 @@ class MainRepository(
             1 ->{
                 if (device != null ){
                     Log.i("DeviceRepository","save air")
-//                    with(preference){
-//                        set(AIR_DEVICE_NAME, device.serialNumber)
-//                        set(AIR_DEVICE_MAC, device.macAddress)
-//                        set(AIR_DEVICE_ACCOUNT_ID, device.accountId)
-//                    }
+                    with(preference){
+                        set(AIR_DEVICE_NAME, device.serialNumber)
+                        set(AIR_DEVICE_MAC, device.macAddress)
+                        set(AIR_DEVICE_ACCOUNT_ID, device.accountId)
+                    }
                 }else{
                     Log.i("DeviceRepository","remove air")
-//                    with(preference){
-//                        set(AIR_DEVICE_NAME, "")
-//                        set(AIR_DEVICE_MAC,"")
-//                        set(AIR_DEVICE_ACCOUNT_ID,"")
-//                    }
+                    with(preference){
+                        set(AIR_DEVICE_NAME, "")
+                        set(AIR_DEVICE_MAC,"")
+                        set(AIR_DEVICE_ACCOUNT_ID,"")
+                    }
                 }
             }
         }
@@ -206,17 +206,17 @@ class MainRepository(
     private fun allClean(){
         Log.i("DeviceRepository","remove all")
         //正式測試ok再開
-//        with(preference){
-//            //雷達波
-//            set(RADAR_DEVICE_MAC, "")
-//            set(RADAR_DEVICE_NAME, "")
-//            set(RADAR_DEVICE_ACCOUNT_ID,"")
-//            set(BED_TYPE,-1)
-//            //空氣盒子
-//            set(AIR_DEVICE_MAC,"")
-//            set(AIR_DEVICE_NAME, "")
-//            set(AIR_DEVICE_ACCOUNT_ID,"")
-//        }
+        with(preference){
+            //雷達波
+            set(RADAR_DEVICE_MAC, "")
+            set(RADAR_DEVICE_NAME, "")
+            set(RADAR_DEVICE_ACCOUNT_ID,"")
+            set(BED_TYPE,-1)
+            //空氣盒子
+            set(AIR_DEVICE_MAC,"")
+            set(AIR_DEVICE_NAME, "")
+            set(AIR_DEVICE_ACCOUNT_ID,"")
+        }
         //未做多台感知器移除方法
     }
 }
