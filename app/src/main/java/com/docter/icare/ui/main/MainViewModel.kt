@@ -9,17 +9,22 @@ import androidx.navigation.NavDestination
 import com.docter.icare.R
 import com.docter.icare.data.entities.device.DeviceInfoEntity
 import com.docter.icare.data.entities.view.MainEntity
+import com.docter.icare.data.entities.webSocket.SocketUpdate
+import com.docter.icare.data.network.api.webSocket.WebServices
+import com.docter.icare.data.repositories.DeviceRepository
 import com.docter.icare.data.repositories.MainRepository
 import com.docter.icare.data.repositories.RadarRepository
 import com.docter.icare.ui.main.expandableList.ExpandableListAdapter
 import com.docter.icare.utils.Coroutines.main
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlin.concurrent.fixedRateTimer
+import kotlinx.coroutines.channels.Channel
 
 class MainViewModel(
     private val mainRepository: MainRepository,
     private val radarRepository: RadarRepository,
+    private val webServices: WebServices,
+    private val deviceRepository: DeviceRepository
 ) : ViewModel() {
     val entity = MainEntity().apply {
         mainRepository.getName().let { getName ->
@@ -143,6 +148,32 @@ class MainViewModel(
 
     fun logout()= mainRepository.logout()
 
-    fun stopSocket() = radarRepository.closeSocket()
+
+    //webSocket
+    var appContext : MutableLiveData<Context> = MutableLiveData(null)
+
+    val isDeviceChange = MutableLiveData<Boolean>()
+
+    val getSocketData: MutableLiveData<SocketUpdate> = MutableLiveData(null)
+
+    fun getDeviceAccountId() = radarRepository.getDeviceAccountId()
+
+    fun isChange(change: Boolean) {
+        isDeviceChange.value = change
+    }
+
+    fun startSocket(context: Context, accountId: Int): Channel<SocketUpdate> =
+        webServices.startSocket( context,accountId)
+
+    fun closeSocket() = webServices.stopSocket()
+
+//    fun restConnect(accountId: Int) =  startSocket(context = appContext.value!!, accountId = accountId )
+    val isRestConnect: MutableLiveData<Int> = MutableLiveData(-1)
+    fun restConnect(accountId: Int) = isRestConnect.postValue(accountId)
+
+//    fun isBluetoothEnabled() = deviceRepository.isBluetoothEnabled()
+    fun isBluetoothEnabled(context: Context) = deviceRepository.isBluetoothEnabled(context)
+
+    fun isHasTemperature() = radarRepository.isHasTemperature()
 
 }

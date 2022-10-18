@@ -3,10 +3,11 @@
     <item android:id="@+id/nav_bedside_monitor"
         android:icon="@drawable/icon_bedside_monitor"
         android:title="@string/bedside_monitor_text"/>
-    <item android:id="@+id/nav_air_quality_index"
-        android:icon="@drawable/icon_air_quality_index"
-        android:title="@string/air_quality"/>
-    <item android:id="@+id/nav_activity_monitoring"
-        android:icon="@drawable/icon_activity_monitoring"
-        android:title="@string/activity_monitoring"/>
+<!--    以下之後功能做完再開-->
+<!--    <item android:id="@+id/nav_air_quality_index"-->
+<!--        android:icon="@drawable/icon_air_quality_index"-->
+<!--        android:title="@string/air_quality"/>-->
+<!--    <item android:id="@+id/nav_activity_monitoring"-->
+<!--        android:icon="@drawable/icon_activity_monitoring"-->
+<!--        android:title="@string/activity_monitoring"/>-->
 </menu>

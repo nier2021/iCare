@@ -131,7 +131,7 @@ class RadarBleManager constructor(
 
         if (bluetoothAdapter == null) return
 
-        bluetoothGatt = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        bluetoothGatt = if (SDK_INT >= android.os.Build.VERSION_CODES.M) {
             if (SDK_INT >= S &&
                 ActivityCompat.checkSelfPermission(context, BLUETOOTH_SCAN) != PERMISSION_GRANTED
             ) {
@@ -340,6 +340,10 @@ class RadarBleManager constructor(
         }
     }
 
+
+    private val adapter = bluetoothManager?.adapter
+
+    fun isBluetoothEnabled()= adapter?.isEnabled
 
 
 }

@@ -223,56 +223,123 @@
                     android:background="@color/welcome_status_bar" />
             </androidx.appcompat.widget.LinearLayoutCompat>
 
-            <include
-                android:id="@+id/layout_btn_bed_type"
-                layout="@layout/layout_button_device"
+<!--            <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--                android:id="@+id/layout_bed_type"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:visibility="gone">-->
+<!--                <include-->
+<!--                    android:id="@+id/layout_btn_bed_type"-->
+<!--                    layout="@layout/layout_button_device"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginStart="40dp"-->
+<!--                    android:layout_marginTop="20dp"-->
+<!--                    android:layout_marginEnd="40dp"-->
+<!--                    android:layout_marginBottom="20dp"-->
+<!--                    app:btnBackground="@{entity.deviceName.length > 0 ? @drawable/background_device_type : @drawable/background_button_grey }"-->
+<!--                    app:btnIcon="@{@drawable/icon_bed_small}"-->
+<!--                    app:btnTitle="@{@string/set_bed_title}"-->
+<!--                    app:click="@{click}"-->
+<!--                    app:btnClickable="@{entity.deviceName.length > 0 ? true : false}"-->
+<!--                    android:visibility="@{entity.type == DeviceEntity.RADAR ? View.VISIBLE : View.GONE}"-->
+<!--                    app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toTopOf="parent" />-->
+<!--            </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+<!--            <androidx.appcompat.widget.LinearLayoutCompat-->
+<!--                android:id="@+id/layout_bed_type_name"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:orientation="vertical"-->
+<!--                android:paddingStart="20dp"-->
+<!--                android:paddingTop="10dp"-->
+<!--                android:paddingEnd="20dp"-->
+<!--                android:paddingBottom="10dp"-->
+<!--                android:visibility="gone">-->
+<!--&lt;!&ndash;                android:visibility="@{entity.type == DeviceEntity.RADAR ? View.VISIBLE : View.GONE}"&ndash;&gt;-->
+
+<!--                <androidx.appcompat.widget.AppCompatTextView-->
+<!--                    android:id="@+id/tv_bed_type_name"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:textColor="@color/black"-->
+<!--                    android:textSize="24sp"-->
+<!--                    android:visibility="@{entity.bedTypeName.length > 0 ? View.VISIBLE : View.GONE}"-->
+<!--                    android:text="@={entity.bedTypeName}"-->
+<!--                    tools:text="BBBBBBBBBBBBBBB"/>-->
+
+<!--                <View-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="1dp"-->
+<!--                    android:layout_marginTop="10dp"-->
+<!--                    android:visibility="@{entity.bedTypeName.length > 0 ? View.VISIBLE : View.GONE}"-->
+<!--                    android:background="@color/welcome_status_bar" />-->
+<!--            </androidx.appcompat.widget.LinearLayoutCompat>-->
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_temperature_calibration"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="@{entity.type == DeviceEntity.RADAR ? View.VISIBLE : View.GONE}">
+                <include
+                    android:id="@+id/layout_btn_temperature_calibration"
+                    layout="@layout/layout_button_device"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="40dp"
+                    android:layout_marginBottom="20dp"
+                    app:btnBackground="@{entity.hasTemperature ? @drawable/background_device_type : @drawable/background_button_grey }"
+                    app:btnIcon="@{@drawable/icon_device_thermostat_w}"
+                    app:btnTitle="@{@string/temperature_calibration}"
+                    app:click="@{click}"
+                    app:btnClickable="@{entity.hasTemperature ? true : false}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+<!--            app:btnBackground="@{entity.deviceName.length > 0 ? @drawable/background_device_type : @drawable/background_button_grey }"-->
+<!--            app:btnClickable="@{entity.deviceName.length > 0 ? true : false}"-->
+<!--            android:visibility="@{entity.hasTemperature ? View.VISIBLE : View.GONE}"-->
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/layout_temperature_calibration_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="40dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="40dp"
-                android:layout_marginBottom="20dp"
-                app:btnBackground="@{entity.deviceName.length > 0 ? @drawable/background_device_type : @drawable/background_button_grey }"
-                app:btnIcon="@{@drawable/icon_bed_small}"
-                app:btnTitle="@{@string/set_bed_title}"
-                app:click="@{click}"
-                app:btnClickable="@{entity.deviceName.length > 0 ? true : false}"
-                android:visibility="@{entity.type == DeviceEntity.RADAR ? View.VISIBLE : View.GONE}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-<!--            app:btnBackground="@{@drawable/background_device_type}"-->
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/layout_bed_type_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:orientation="vertical"
-            android:paddingStart="20dp"
-            android:paddingTop="10dp"
-            android:paddingEnd="20dp"
-            android:paddingBottom="10dp"
-            android:visibility="@{entity.type == DeviceEntity.RADAR ? View.VISIBLE : View.GONE}">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_bed_type_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="24sp"
-                android:visibility="@{entity.bedTypeName.length > 0 ? View.VISIBLE : View.GONE}"
-                android:text="@={entity.bedTypeName}"
-                tools:text="BBBBBBBBBBBBBBB"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
                 android:layout_marginTop="10dp"
-                android:visibility="@{entity.bedTypeName.length > 0 ? View.VISIBLE : View.GONE}"
-                android:background="@color/welcome_status_bar" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
+                android:orientation="vertical"
+                android:paddingStart="20dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="10dp"
+                android:visibility="@{entity.type == DeviceEntity.RADAR ? View.VISIBLE : View.GONE}">
+
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tv_temperature_calibration_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="24sp"
+                    android:visibility="@{entity.temperatureName.length > 0 ? View.VISIBLE : View.GONE}"
+                    android:text="@={entity.temperatureName}"
+                    tools:text="BBBBBBBBBBBBBBB"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="10dp"
+                    android:visibility="@{entity.temperatureName.length > 0 ? View.VISIBLE : View.GONE}"
+                    android:background="@color/welcome_status_bar" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="50dp"

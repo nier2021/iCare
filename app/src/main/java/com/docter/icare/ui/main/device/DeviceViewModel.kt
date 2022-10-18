@@ -10,12 +10,12 @@ import androidx.lifecycle.ViewModel
 import com.docter.icare.R
 import com.docter.icare.data.bleUtil.bleInterface.BleConnectListener
 import com.docter.icare.data.bleUtil.bleInterface.BleDataReceiveListener
-import com.docter.icare.data.bleUtil.device.radar.RadarBleManager
 import com.docter.icare.data.entities.device.ToastAlertEntity
 import com.docter.icare.data.entities.view.AccountInfo
 import com.docter.icare.data.entities.view.DeviceEntity
 import com.docter.icare.data.entities.view.LoginEntity
 import com.docter.icare.data.repositories.DeviceRepository
+import com.docter.icare.data.repositories.RadarRepository
 import com.docter.icare.data.resource.RADAR_DEVICE_ACCOUNT_ID
 import com.docter.icare.data.resource.RADAR_DEVICE_MAC
 import com.docter.icare.data.resource.RADAR_DEVICE_NAME
@@ -29,7 +29,8 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 class DeviceViewModel(
-    private val deviceRepository: DeviceRepository
+    private val deviceRepository: DeviceRepository,
+    private val radarRepository: RadarRepository
 ) : ViewModel() {
     val entity = DeviceEntity()
     var appContext : MutableLiveData<Context> = MutableLiveData(null)
@@ -38,9 +39,10 @@ class DeviceViewModel(
     val throwMessage = MutableLiveData(ToastAlertEntity())
 //    var accountInfo = AccountInfo()
 //    val connectFlag = MutableLiveData(-1)//0:寫入wifi 1:校正距離
-    val bedTypeChangeFlag: MutableLiveData<Boolean> = MutableLiveData(false)
-    val setBedType: MutableLiveData<Int> = MutableLiveData(1)
+//    val bedTypeChangeFlag: MutableLiveData<Boolean> = MutableLiveData(false)
+//    val setBedType: MutableLiveData<Int> = MutableLiveData(1)
     val isBleConnectSuccess: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isSetProgress: MutableLiveData<Boolean> = MutableLiveData(false)
 
 //    init {
 //        setSettingReceiveCallback()
@@ -48,7 +50,7 @@ class DeviceViewModel(
 
     fun setType(type: String) =  deviceRepository.setType(type)
 
-    fun getDeviceInfo(context: Context){
+    fun getDeviceInfo(){
        if (entity.deviceType.isNotEmpty()) deviceRepository.getDeviceInfo(entity).let {
            with(entity){
                deviceName = it.deviceName
@@ -63,8 +65,10 @@ class DeviceViewModel(
                Log.i("DeviceViewModel","entity wifiPassword=>$wifiPassword")
 //               Log.i("DeviceViewModel","wifiAccount=>${it.wifiAccount.value}")
 //               Log.i("DeviceViewModel","wifiPassword=>${it.wifiPassword.value}")
-               if (bedType > 0) bedTypeName.postValue(bedType.toBedName(context)) else bedTypeName.postValue("")
-               setBedType.value = bedType
+               temperatureName.value = it.temperatureName.value
+//               if (bedType > 0) bedTypeName.postValue(bedType.toBedName(context)) else bedTypeName.postValue("")
+//               setBedType.value = bedType
+               hasTemperature.postValue(radarRepository.isHasTemperature())
            }
        }
     }
@@ -79,7 +83,7 @@ class DeviceViewModel(
     suspend fun unBindDevice(context: Context) = withContext(Dispatchers.IO) { deviceRepository.deviceBindingRequest(context,null,0,entity.deviceType)}
 
 
-    fun bleConnect(mac: String ,bleConnectListener: BleConnectListener)  {
+    private fun bleConnect(mac: String, bleConnectListener: BleConnectListener)  {
         with(deviceRepository){
             connectDevice(entity.deviceType,mac)
             bleConnect(entity.deviceType,bleConnectListener)
@@ -146,19 +150,37 @@ class DeviceViewModel(
 //
 //    }
 
-    fun setAppendDistance(context: Context) {
-        isDataSend.postValue(true)
+//    fun setAppendDistance(context: Context) {
+//        isDataSend.postValue(true)
+//        runCatching {
+//            deviceRepository.setAppendDistance(setBedType.value!!)
+//        }.onSuccess {
+//            isDataSend.postValue(false)
+//            throwMessage.value = ToastAlertEntity(message = appContext.value!!.getString(R.string.calibration_success))
+//            getDeviceInfo(context)
+//        }.onFailure {
+//            isDataSend.postValue(false)
+//            throwMessage.value = ToastAlertEntity(message = appContext.value!!.getString(R.string.calibration_failed))
+//        }
+//    }
+
+    fun setTemperatureCalibration(temperature: String) {
+        deviceRepository.setTemperatureCalibration(temperature)
+        main { isSetProgress.value = true }
         runCatching {
-            deviceRepository.setAppendDistance(setBedType.value!!)
+            deviceRepository.setTemperatureCalibration(temperature)
         }.onSuccess {
-            isDataSend.postValue(false)
-            throwMessage.value = ToastAlertEntity(message = appContext.value!!.getString(R.string.choose_bed_type_success))
-            getDeviceInfo(context)
+            waitDevice("setTemperatureCalibration")
+//            isSetProgress.postValue(false)
+//            throwMessage.value = ToastAlertEntity(message = appContext.value!!.getString(R.string.calibration_success))
+//            getDeviceInfo()
         }.onFailure {
-            isDataSend.postValue(false)
-            throwMessage.value = ToastAlertEntity(message = appContext.value!!.getString(R.string.error_send_bed_type))
+            main { isSetProgress.value = false }
+            throwMessage.value = ToastAlertEntity(message = appContext.value!!.getString(R.string.calibration_failed))
         }
     }
+
+    fun waitDevice(msg: String) = Log.i("DeviceViewModel","$msg... waitDevice")
 
 
     fun setSettingReceiveCallback()=  deviceRepository.setSettingReceiveCallback(bleSettingReceiveCallback)
@@ -170,12 +192,19 @@ class DeviceViewModel(
             val receiveString = String(data)
             Log.i("DeviceViewModel","bleSettingReceiveCallback receiveString=>$receiveString")
             main{
+               isSetProgress.value = false
                 when(receiveString){
                     "CONNECT SUCCESS" -> throwMessage.value = ToastAlertEntity(isToastAlert = true, message = appContext.value!!.getString(R.string.device_connect_success))
                     "WIFI CONNECT FAIL" -> throwMessage.value = ToastAlertEntity(isToastAlert = true, message = appContext.value!!.getString(R.string.device_connect_wifi_fail))
                     "SERVER CONNECT FAIL" ->throwMessage.value = ToastAlertEntity(isToastAlert = true, message = appContext.value!!.getString(R.string.device_connect_fail))
                     "LOAD SERVER FAIL" -> throwMessage.value = ToastAlertEntity(isToastAlert = true, message = appContext.value!!.getString(R.string.device_connect_fail))
                     "OTHER FAIL" -> throwMessage.value = ToastAlertEntity(isToastAlert = true, message = appContext.value!!.getString(R.string.device_failure))
+                }
+                //回傳TMP表示成功
+                if (receiveString.contains("TMP")) {
+                    Log.i("DeviceViewModel","bleSettingReceiveCallback ontains(\"TMP\") =>$receiveString")
+                    throwMessage.value = ToastAlertEntity(message = appContext.value!!.getString(R.string.calibration_success))
+                    getDeviceInfo()
                 }
             }
 

@@ -15,9 +15,11 @@ data class DeviceEntity(
 //    var isWifiBind :MutableLiveData<Boolean> = MutableLiveData(false),
     val wifiAccount: MutableLiveData<String> = MutableLiveData("") ,
 //    val wifiPassword:MutableLiveData<String> = MutableLiveData("") ,
-    var bedType: Int = -1,
+//    var bedType: Int = -1,
 //    var bedTypeName: String = "",
-    val bedTypeName: MutableLiveData<String> = MutableLiveData("") ,
+//    val bedTypeName: MutableLiveData<String> = MutableLiveData("") ,
+    val temperatureName: MutableLiveData<String> = MutableLiveData("") ,
+    val hasTemperature: MutableLiveData<Boolean> = MutableLiveData(false),
     var deviceMac: String = "",
     var deviceAccountId: String =""
 //            android:background="@{entity.type == BloodPressureEntity.TYPE_PULSE_TRANSIT_TIME ? @color/colorPrimaryDark : @color/hintColor}"

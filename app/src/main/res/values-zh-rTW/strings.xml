@@ -232,8 +232,8 @@
     <string name="bed_type_3_text">單人\n90X200公分\n(3X6.6台尺)</string>
     <string name="bed_type_4_text">單人加大\n120X200公分\n(4X6.6台尺)</string>
     <string name="error_choose_bed_type">你尚未選擇床型！</string>
-    <string name="error_send_bed_type">修改選擇床型失敗！</string>
-    <string name="choose_bed_type_success">變更床型成功</string>
+<!--    <string name="error_send_bed_type">修改選擇床型失敗！</string>-->
+<!--    <string name="choose_bed_type_success">變更床型成功</string>-->
     <string name="try_again">請再按一次</string>
     <string name="error_connect_device_state">目前尚未連接設備,正在嘗試自動連接....</string>
     <string name="heart_rate_unit">bpm</string>
@@ -267,4 +267,13 @@
     <string name="drawer_set_up">功能設定</string>
 
     <string name="exception_notification">異常通知</string>
+    <string name="not_open_wifi">確保您的 WiFi 已打開。</string>
+    <string name="no_supports_check_wifi">該功能僅支持Android 10或更高版本的設備。</string>
+    <string name="no_open_bluetooth">請確認已開啟藍牙。</string>
+    <string name="temperature_calibration">溫度校準</string>
+    <string name="temperature_calibration_hit">請輸入35&#8211;42之間的體溫。</string>
+    <string name="error_temperature_calibration_isBlank">請輸入體溫。</string>
+    <string name="calibration_success">校準成功。</string>
+    <string name="calibration_failed">校準失敗。</string>
+
 </resources>

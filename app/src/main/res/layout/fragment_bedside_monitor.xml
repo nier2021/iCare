@@ -40,6 +40,7 @@
                 android:layout_marginEnd="10dp"
                 android:onClick="@{click::onClick}"
                 android:src="@drawable/icon_refresh"
+                android:visibility="@{entity.isShowRefresh ? View.VISIBLE : View.GONE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -102,15 +103,16 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/btn_login_white"
                 android:gravity="center"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
+                android:padding="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/iv_frame_bed"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/iv_frame_bed"
                 app:layout_constraintTop_toBottomOf="@+id/iv_frame_bed">
+<!--                android:paddingTop="20dp"-->
+<!--                android:paddingBottom="20dp"-->
+<!--                android:paddingStart="10dp"-->
+<!--                android:paddingEnd="10dp"-->
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/layout_heart_rate"
@@ -125,18 +127,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="4"
-                        android:padding="10dp"
                         android:src="@drawable/icon_heart_rate_blue" />
-
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tv_heart_rate"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="0dp"
                         android:layout_weight="4"
                         android:gravity="center"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp"
                         android:text="@{entity.heartRate.length > 0 ? entity.heartRate : @string/no_data_text}"
                         android:textColor="@{entity.heartRate.length > 0 ? entity.heartRateTextColor :   @color/radar_out_bed_color}"
                         android:textSize="32sp"
@@ -146,10 +144,9 @@
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tv_heart_rate_unit"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="0dp"
                         android:layout_weight="2"
                         android:gravity="center"
-                        android:padding="10dp"
                         android:text="@string/heart_rate_unit"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
@@ -178,7 +175,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="4"
-                        android:padding="10dp"
                         android:src="@drawable/icon_breath_frequency_blue" />
 
                     <androidx.appcompat.widget.AppCompatTextView
@@ -186,8 +182,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp"
                         android:text="@{entity.breathState.length > 0 ? entity.breathState : @string/no_data_text}"
                         android:textColor="@{entity.breathState.length > 0 ? entity.breathStateTextColor : @color/radar_out_bed_color }"
                         android:textSize="32sp"
@@ -200,7 +194,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:gravity="center"
-                        android:padding="10dp"
                         android:text="@string/breath_state_unit"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
@@ -232,7 +225,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="4"
-                        android:padding="10dp"
                         android:src="@{entity.iconBedStatus == null ? @drawable/icon_body_temperature_blue : entity.iconBodyTemperature }"
                         tools:src="@drawable/icon_body_temperature_blue" />
 
@@ -242,8 +234,6 @@
                         android:layout_height="match_parent"
                         android:layout_weight="5"
                         android:gravity="center"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp"
                         android:text="@{entity.bodyTemperature == BedsideMonitorEntity.BODY_TEMPERATURE_ERROR  ? @string/no_data_text : entity.bodyTemperature}"
                         android:textColor="@{entity.bodyTemperature == BedsideMonitorEntity.BODY_TEMPERATURE_ERROR  ? @color/radar_out_bed_color : entity.bodyTemperatureTextColor }"
                         android:textSize="32sp"
@@ -256,7 +246,6 @@
                         android:layout_height="match_parent"
                         android:layout_weight="3"
                         android:gravity="center"
-                        android:padding="10dp"
                         android:text="@string/body_temperature_unit"
                         android:textColor="@color/black"
                         android:textSize="16sp" />

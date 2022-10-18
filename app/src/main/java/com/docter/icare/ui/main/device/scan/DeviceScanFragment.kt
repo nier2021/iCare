@@ -18,15 +18,14 @@ import com.docter.icare.R
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.docter.icare.data.bleUtil.bleInterface.BleConnectListener
+import com.docter.icare.data.bleUtil.bleInterface.BleDataReceiveListener
+import com.docter.icare.data.entities.device.ToastAlertEntity
 import com.docter.icare.databinding.FragmentDeviceScanBinding
 import com.docter.icare.ui.base.BaseFragment
 import com.docter.icare.ui.main.MainActivity
 import com.docter.icare.ui.main.MainViewModel
-import com.docter.icare.utils.Coroutines
+import com.docter.icare.utils.*
 import com.docter.icare.utils.Coroutines.main
-import com.docter.icare.utils.clearStack
-import com.docter.icare.utils.snackbar
-import com.docter.icare.utils.toast
 import com.docter.icare.view.RecyclerDivider
 import com.docter.icare.view.dialog.CustomAlertDialog
 import com.docter.icare.view.dialog.CustomProgressDialog
@@ -35,6 +34,7 @@ import io.reactivex.rxjava3.core.Observable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.internal.wait
 import org.kodein.di.android.x.closestDI
 import org.kodein.di.instance
 import java.util.concurrent.TimeUnit
@@ -52,6 +52,8 @@ class DeviceScanFragment : BaseFragment() {
     private val scanProgressDialog: CustomProgressDialog by lazy { CustomProgressDialog(requireActivity(), R.string.scanning_text) }
 
     private val connectProgressDialog: CustomProgressDialog by lazy { CustomProgressDialog( requireActivity(), R.string.connecting) }
+
+    private val setProgressDialog: CustomProgressDialog by lazy { CustomProgressDialog( requireActivity(), R.string.set_up) }
 
     private val confirmBindDeviceDialog: CustomAlertDialog by lazy {
         CustomAlertDialog(requireActivity())
@@ -85,6 +87,9 @@ class DeviceScanFragment : BaseFragment() {
         }
         with(viewModel){
             getAccountInfo()
+
+            setSettingReceiveCallback(bleSettingReceiveCallback)
+
             isScan.observe(viewLifecycleOwner){
                 if (it){
                     scanProgressDialog.show()
@@ -103,7 +108,6 @@ class DeviceScanFragment : BaseFragment() {
                 }
             }
         }
-
 
         return binding.root
     }
@@ -141,7 +145,12 @@ class DeviceScanFragment : BaseFragment() {
     override fun onClick(view: View) {
         super.onClick(view)
         when(view){
-            binding.layoutBtnDeviceScan.root -> viewModel.startScan()
+            binding.layoutBtnDeviceScan.root -> {
+//                if (activityViewModel.isBluetoothEnabled() == true){
+                if (activityViewModel.isBluetoothEnabled(requireContext().applicationContext)){
+                    viewModel.startScan()
+                } else binding.root.snackbar(R.string.no_open_bluetooth)
+            }
         }
     }
 
@@ -159,7 +168,8 @@ class DeviceScanFragment : BaseFragment() {
                     binding.root.snackbar(R.string.failed_connect_device)
                 }
             }.onFailure {
-//                Log.i("DeviceScanViewModel","deviceBindingRequest bind_Failure")
+                Log.i("DeviceScanViewModel","deviceBindingRequest bind_Failure")
+                viewModel.bleDisconnect()
                 main { connectProgressDialog.dismiss() }
                 it.printStackTrace()
                 binding.root.snackbar(it)
@@ -192,7 +202,7 @@ class DeviceScanFragment : BaseFragment() {
         runCatching {
             viewModel.wifiSetData()
         }.onSuccess {
-            if (viewModel.deviceType.value == "Radar" ) setAppendDistance()
+            if (viewModel.deviceType.value == "Radar") waitRadar("wifiSetData")
             else {
                 main { connectProgressDialog.dismiss() }
                 //未來看空氣盒子或姿態感知要做啥(沒有=> connectProgressDialog.dismiss()
@@ -206,31 +216,139 @@ class DeviceScanFragment : BaseFragment() {
         }
     }
 
-    private fun setAppendDistance(){
-        runCatching {
-            viewModel.setAppendDistance()
-        }.onSuccess {
+    private fun waitRadar(msg:String){
+        Log.i("DeviceScanViewModel","$msg... waitRadar")
+    }
+
+    private fun goNext(){
+        //找裝置名稱是否有溫感器 没有温度的编号开头是TMOT04V1，有温度编号的是TMOT04V2
+        val isHasTemperature = viewModel.isHasTemperature()
+        Log.i("DeviceScanViewModel","goNext isHasTemperature=>$isHasTemperature")
+        if (isHasTemperature) setTemperatureCalibration()
+        else{
             main {
-//                viewModel.bleDisconnect()
+                viewModel.cleanTemperature()//清理綁定時的假預設溫度資料
                 connectProgressDialog.dismiss()
                 toastAlertDialog.apply {
                     setMessage(getString(R.string.bind_success))
                     setButton(){
+                        activityViewModel.isChange(true)//webSocket
                         requireActivity().onBackPressed()
                     }
                 }.show()
-//                binding.root.snackbar(R.string.bind_success)
-//
             }
+        }
+    }
+
+    //先取得裝置連接server成功回傳在去做下一步
+    private val bleSettingReceiveCallback = object : BleDataReceiveListener {
+        override fun onRadarData(data: ByteArray) {
+            super.onRadarData(data)
+            Log.i("DeviceScanViewModel","onRadarData=>${data.toHexStringSpace()}")
+            val receiveString = String(data)
+            Log.i("DeviceScanViewModel","bleSettingReceiveCallback receiveString=>$receiveString")
+            main {
+                connectProgressDialog.dismiss()
+                when (receiveString) {
+                    "CONNECT SUCCESS" -> {
+                        requireContext().toast(R.string.device_connect_success)
+                        goNext()
+                    }
+
+                    "WIFI CONNECT FAIL" -> binding.root.snackbar(R.string.device_connect_wifi_fail)
+
+                    "SERVER CONNECT FAIL" -> binding.root.snackbar(R.string.device_connect_fail)
+
+                    "LOAD SERVER FAIL" -> binding.root.snackbar(R.string.device_connect_fail)
+
+                    "OTHER FAIL" ->binding.root.snackbar(R.string.device_failure)
+                }
+
+                //回傳TMP表示成功之後顯示成功按鈕按下就退回上一頁
+                if (receiveString.contains("TMP")){
+                    Log.i(
+                        "DeviceScanViewModel",
+                        "bleSettingReceiveCallback ontains(\"TMP\") =>$receiveString"
+                    )
+
+                    setProgressDialog.dismiss()
+                    toastAlertDialog.apply {
+                        setMessage(getString(R.string.bind_success))
+                        setButton(){
+                            activityViewModel.isChange(true)//webSocket
+                            requireActivity().onBackPressed()
+                        }
+                    }.show()
+                }
+
+            }
+
+            //1、CONNECT SUCCESS 2、WIFI CONNECT FAIL 3、SERVER CONNECT FAIL 4、LOAD SERVER FAIL 5、OTHER FAIL
+            ////成功连接 WiFi 并登陆上后台 //WiFi 连接失败
+            ////对服务端连接失败 //登陆后台失败
+            ////其他失败情况
+        }
+    }
+
+    private fun setTemperatureCalibration(){
+        main {  setProgressDialog.show() }
+        runCatching {
+            viewModel.setTemperatureCalibration()
+        }.onSuccess {
+            waitRadar("setTemperatureCalibration")
         }.onFailure {
             it.printStackTrace()
             main {
-                connectProgressDialog.dismiss()
+                setProgressDialog.dismiss()
                 binding.root.snackbar(R.string.bind_failed)
                 requireActivity().onBackPressed()
             }
         }
     }
+
+
+//    fun setTemperatureCalibration(temperature: String) {
+//        deviceRepository.setTemperatureCalibration(temperature)
+//        isDataSend.postValue(true)
+//        runCatching {
+//            deviceRepository.setTemperatureCalibration(temperature)
+//        }.onSuccess {
+//            isDataSend.postValue(false)
+//            throwMessage.value = ToastAlertEntity(message = appContext.value!!.getString(R.string.calibration_success))
+//            getDeviceInfo(appContext.value!!)
+//        }.onFailure {
+//            isDataSend.postValue(false)
+//            throwMessage.value = ToastAlertEntity(message = appContext.value!!.getString(R.string.calibration_failed))
+//        }
+//    }
+
+//    private fun setAppendDistance(){
+//        runCatching {
+//            viewModel.setAppendDistance()
+//        }.onSuccess {
+//            main {
+////                viewModel.bleDisconnect()
+//                connectProgressDialog.dismiss()
+//                toastAlertDialog.apply {
+//                    setMessage(getString(R.string.bind_success))
+//                    setButton(){
+//                        activityViewModel.isChange(true)//webSocket
+//                        requireActivity().onBackPressed()
+//                    }
+//                }.show()
+////                binding.root.snackbar(R.string.bind_success)
+////
+//            }
+//        }.onFailure {
+//            it.printStackTrace()
+//            main {
+//                connectProgressDialog.dismiss()
+//                binding.root.snackbar(R.string.bind_failed)
+//                requireActivity().onBackPressed()
+//            }
+//        }
+//    }
+
 
 
 }

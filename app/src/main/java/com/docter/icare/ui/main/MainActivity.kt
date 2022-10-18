@@ -1,5 +1,6 @@
 package com.docter.icare.ui.main
 
+import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ExpandableListView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavController
 import com.docter.icare.R
@@ -41,6 +43,7 @@ import com.docter.icare.utils.Coroutines.main
 import com.docter.icare.view.dialog.CustomAlertDialog
 import com.docter.icare.view.dialog.CustomProgressDialog
 import com.google.android.material.navigation.NavigationBarView
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import org.kodein.di.instance
 
@@ -69,6 +72,13 @@ class MainActivity : BaseActivity() {
                 checkDevice()
             }
             .setNegativeButton(R.string.no_text)
+    }
+
+    private val activityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+
+        if (it.resultCode == RESULT_OK) {
+            Log.i("MainActivity","藍芽打開 背景回傳需要監聽服務可以寫在這")
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -129,36 +139,52 @@ class MainActivity : BaseActivity() {
                 viewModel.menuClick(it)
             }
         }
+
+
+        //webSocket
+        viewModel.appContext.value = this.applicationContext
+        //監測是否有改變
+        viewModel.isDeviceChange.observe(this){
+            Log.i("MainActivity","isDeviceChange observe")
+            if (it) getDeviceAccountId()
+        }
+        //檢查藍芽
+        checkBluetooth()
+        //重心連接
+        viewModel.isRestConnect.observe(this){
+            if (it != -1 ) connectionWebSocket(it)
+        }
     }
 
     private var bottomNavListener = NavigationBarView.OnItemSelectedListener {
 //    private var bottomNavListener = BottomNavigationView.OnNavigationItemSelectedListener {//已被棄用
 //        Log.i("MainActivity","itemId=>${it.itemId}")
         when (it.itemId) {
-
-            R.id.nav_air_quality_index ->{
+//之後有做功能再開以下(還有bottom_nav_menu)
+//            R.id.nav_air_quality_index ->{
 //                Log.i("MainActivity","airQualityIndexFragment")
-                navController.navigate(R.id.airQualityIndexFragment)//等做完再開啟
+////                navController.navigate(R.id.airQualityIndexFragment)//等做完再開啟
 //                this@MainActivity.toast("尚未開放")
-                true//等做完再開啟
+////                true//等做完再開啟
 //                false
-
-            }
-            R.id.nav_activity_monitoring -> {
-//                Log.i("MainActivity","activityMonitoringFragment")
-//                navController.navigate(R.id.activityMonitoringFragment)//等做完再開啟
+//
+//            }
+//            R.id.nav_activity_monitoring -> {
+////                Log.i("MainActivity","activityMonitoringFragment")
+////                navController.navigate(R.id.activityMonitoringFragment)//等做完再開啟
 //                this@MainActivity.toast("尚未開放")
-//                true//等做完再開啟
-                false
-            }
+////                true//等做完再開啟
+//                false
+//            }
+//以上等之後有做功能再開啟
             else -> {
                 //以上等做完再開啟
 //                 R.id.nav_bedside_monitor
 //                Log.i("MainActivity","bedsideMonitorFragment")
-//                navController.navigate(R.id.bedsideMonitorFragment)
-//                binding.toolbar.setBackgroundColor(ContextCompat.getColor(this,R.color.welcome_status_bar))
-//                true
-                false
+                navController.navigate(R.id.bedsideMonitorFragment)
+                binding.toolbar.setBackgroundColor(ContextCompat.getColor(this,R.color.welcome_status_bar))
+                true
+
             }
         }
 //        false
@@ -259,7 +285,7 @@ class MainActivity : BaseActivity() {
         Log.i("MainActivity","onClose")
         lifecycleScope.launch {
             runCatching {
-                viewModel.stopSocket()
+                viewModel.closeSocket()
             }.onSuccess {
                 unBindDevice(deviceInfoEntity)
                 Log.i("MainActivity","onClose  onSuccess")
@@ -314,14 +340,18 @@ class MainActivity : BaseActivity() {
 
 
     //取得後台登入帳號裝置狀態
-    fun getAccountDeviceInfo(){
+    private fun getAccountDeviceInfo(){
         Log.i("MainActivity","getAccountDeviceInfo")
         lifecycleScope.launch {
             runCatching {
                 viewModel.getAccountDeviceInfo()
             }.onSuccess {
                 Log.i("MainActivity","getAccountDeviceInfo onSuccess getDeviceList=>$it")
-//                if (it[0].deviceType == 1)   Log.i("MainActivity","it[0].deviceType == 1") else  Log.i("MainActivity","it[0].deviceType != 1")
+                //is device bind?
+                if (it.isNotEmpty()){
+                    getDeviceAccountId()
+                    viewModel.isHasTemperature()
+                }else viewModel.closeSocket()
             }.onFailure {
                 Log.i("MainActivity","getAccountDeviceInfo onFailure e=>${it.message}")
                 it.printStackTrace()
@@ -352,6 +382,53 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    //webSocket
+    private fun getDeviceAccountId() {
+        Log.i("MainActivity","getDeviceAccountId")
+        viewModel.getDeviceAccountId().let {
+            if (it != -1){
+                connectionWebSocket(it)
+            }else{
+                lifecycleScope.launch {
+                    viewModel.closeSocket()
+                }
+            }
+        }
+    }
 
+    private fun connectionWebSocket(accountId: Int){
+        //後端傳送4狀態正躺 側躺 坐在床邊 離床
+        //狀態顏色&&圖片 在床&&側躺＆＆ 藍色 圖相同 值：狀態顯示文字不同 ; 離床&&無人：顏色＝>灰色 圖不同 無值--(直接顯示不管是否有收到呼吸等值);
+        Log.i("MainActivity","connectionWebSocket")
+        lifecycleScope.launch {
+            try {
+                Log.i("MainActivity","connectionWebSocket try")
+                viewModel.startSocket(this@MainActivity.applicationContext, accountId).consumeEach {
+//                    Log.i("MainActivity","connectionWebSocket getSocketData=>$it}")
+                    main {  viewModel.getSocketData.value = it  }//
+                }
+
+            } catch (ex: java.lang.Exception) {
+                binding.root.snackbar(ex)
+
+                Log.i("MainActivity","connectionWebSocket catch ex=>${ex.message}")
+            }
+        }
+
+    }
+
+    private fun checkBluetooth() {
+//        if ( viewModel.isBluetoothEnabled()!= null){
+//            when {
+//                viewModel.isBluetoothEnabled()!! -> Log.i("MainActivity","藍芽打開 需要監聽服務可以寫在這")
+//                else -> activityLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
+//            }
+//        }
+        when {
+            viewModel.isBluetoothEnabled(this)-> Log.i("MainActivity","藍芽打開 需要監聽服務可以寫在這")
+            else -> activityLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
+        }
+
+    }
 
 }

@@ -27,12 +27,12 @@ class MainRepository(
         val titleData = HashMap<String, List<String>>()
         val deviceList = ArrayList<String>()
         deviceList.add(resource.getString(R.string.bedside_monitor_text))
-        deviceList.add(resource.getString(R.string.air_quality))
-        deviceList.add(resource.getString(R.string.activity_monitoring))
+//        deviceList.add(resource.getString(R.string.air_quality))//之後有做功能再開
+//        deviceList.add(resource.getString(R.string.activity_monitoring))//之後有做功能再開
 
         val aboutList = ArrayList<String>()
-        aboutList.add(resource.getString(R.string.about))
-        aboutList.add(resource.getString(R.string.privacy_policy))
+//        aboutList.add(resource.getString(R.string.about))//之後有做功能再開
+//        aboutList.add(resource.getString(R.string.privacy_policy))//之後有做功能再開
         aboutList.add(resource.getString(R.string.logout))
 
         titleData[resource.getString(R.string.device_management_text)] = deviceList

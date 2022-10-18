@@ -1,11 +1,16 @@
 package com.docter.icare.ui.welcome
 
+import android.Manifest
 import android.content.Intent
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.Q
 import android.os.Bundle
+import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.docter.icare.ui.main.MainActivity
 import com.docter.icare.R
+import com.docter.icare.data.repositories.WelcomeRepository.Companion.PERMISSION
 import com.docter.icare.databinding.ActivityWelcomeBinding
 import com.docter.icare.ui.base.BaseActivity
 import com.docter.icare.ui.start.StartActivity
@@ -49,15 +54,27 @@ class WelcomeActivity : BaseActivity() {
         when {
 
             //If permission is not granted, request permission.
-            viewModel.isNeedAskPermission() -> requestPermissions(
-                viewModel.permissionArray,
-                0
-            )
+//            viewModel.isNeedAskPermission() -> requestPermissions(
+//                viewModel.permissionArray,
+//                0
+//            )
+
+            viewModel.isNeedAskPermission() -> {
+
+                //If permission is not granted, request permission.
+                ActivityCompat.requestPermissions(
+                    this@WelcomeActivity,
+                    viewModel.permissionArray,
+                    PERMISSION
+                )
+            }
+
 
             else -> chooseNext()
         }
     }
 
+    //If permission is not granted, ask again.
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -65,11 +82,29 @@ class WelcomeActivity : BaseActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        when {
-            viewModel.isNeedAskPermission(grantResults) -> if (!askPermissionAgainDialog.isShowing()) askPermissionAgainDialog.show()
-            else -> chooseNext()
+        when (requestCode) {
+
+            PERMISSION -> when {
+                viewModel.isNeedAskPermission(grantResults) -> main { askPermissionAgainDialog.show() }
+                else -> chooseNext()
+            }
+
+//            else -> chooseNext()
         }
     }
+
+//    override fun onRequestPermissionsResult(
+//        requestCode: Int,
+//        permissions: Array<out String>,
+//        grantResults: IntArray
+//    ) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+//
+//        when {
+//            viewModel.isNeedAskPermission(grantResults) -> if (!askPermissionAgainDialog.isShowing()) askPermissionAgainDialog.show()
+//            else -> chooseNext()
+//        }
+//    }
 
     private fun chooseNext(){
         when {

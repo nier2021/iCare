@@ -9,9 +9,11 @@ import com.docter.icare.R
 import com.docter.icare.data.bleUtil.bleInterface.BleConnectListener
 import com.docter.icare.data.bleUtil.bleInterface.BleDataReceiveListener
 import com.docter.icare.data.bleUtil.bleInterface.BleScanCallback
+import com.docter.icare.data.entities.device.ToastAlertEntity
 import com.docter.icare.data.entities.view.AccountInfo
 import com.docter.icare.data.entities.view.item.DeviceScanItemEntity
 import com.docter.icare.data.repositories.DeviceRepository
+import com.docter.icare.data.repositories.RadarRepository
 import com.docter.icare.utils.Coroutines
 import com.docter.icare.utils.toHexStringSpace
 import com.xwray.groupie.GroupieAdapter
@@ -19,7 +21,8 @@ import java.util.concurrent.TimeUnit
 import io.reactivex.rxjava3.core.Observable.timer
 
 class DeviceScanViewModel(
-    private val deviceRepository: DeviceRepository
+    private val deviceRepository: DeviceRepository,
+    private val radarRepository: RadarRepository
 ) : ViewModel() {
     private var deviceScanData: MutableList<DeviceScanItemEntity> = mutableListOf()
     val deviceType : MutableLiveData<String> = MutableLiveData("")
@@ -27,6 +30,7 @@ class DeviceScanViewModel(
     val currentItem = MutableLiveData(DeviceScanItemEntity())
     val adapter = GroupieAdapter()
     var accountInfo = AccountInfo()
+
 
     fun getAccountInfo(){
         accountInfo = deviceRepository.getAccountInfo()
@@ -87,6 +91,15 @@ class DeviceScanViewModel(
 
     fun setAppendDistance() =  deviceRepository.setAppendDistance(1)
 
+    fun setSettingReceiveCallback(bleSettingReceiveCallback: BleDataReceiveListener)=  deviceRepository.setSettingReceiveCallback(bleSettingReceiveCallback)
+
+    fun isHasTemperature() = radarRepository.isHasTemperature()
+
+    fun setTemperatureCalibration() {
+        deviceRepository.setTemperatureCalibration("35")
+    }
+
+    fun cleanTemperature() = radarRepository.cleanTemperature()
 
 
 

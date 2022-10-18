@@ -42,15 +42,15 @@ class MVVMApplication : Application(), DIAware {
         bind { singleton { RegisterRepository(instance(), instance(), instance()) } }
         bind { singleton { MainRepository(instance(), instance(), instance(), instance(), instance()) } }
         bind { singleton { DeviceRepository(instance(), instance(), instance(),instance(),instance()) } }
-        bind { singleton { RadarRepository(instance(), instance(), instance()) } }
+        bind { singleton { RadarRepository(instance(), instance()) } }
 
         //Factory
         bind { provider { WelcomeViewModelFactory(instance()) } }
         bind { provider { LoginViewModelFactory(instance()) } }
         bind { provider { RegisterViewModelFactory(instance()) } }
-        bind { provider { MainViewModelFactory(instance(),instance()) } }
-        bind { provider { DeviceViewModelFactory(instance()) } }
-        bind { provider { DeviceScanViewModelFactory(instance()) } }
+        bind { provider { MainViewModelFactory(instance(),instance(),instance(),instance()) } }
+        bind { provider { DeviceViewModelFactory(instance() ,instance()) } }
+        bind { provider { DeviceScanViewModelFactory(instance(), instance()) } }
         bind { provider { BedsideMonitorViewModelFactory(instance()) } }
         bind { provider { ActivityMonitoringViewModelFactory(instance()) } }
 

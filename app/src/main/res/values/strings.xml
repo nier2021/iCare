@@ -231,8 +231,8 @@
     <string name="bed_type_3_text">單人\n90X200公分\n(3X6.6台尺)</string>
     <string name="bed_type_4_text">單人加大\n120X200公分\n(4X6.6台尺)</string>
     <string name="error_choose_bed_type">你尚未選擇床型！</string>
-    <string name="error_send_bed_type">修改選擇床型失敗！</string>
-    <string name="choose_bed_type_success">變更床型成功</string>
+<!--    <string name="error_send_bed_type">修改選擇床型失敗！</string>-->
+<!--    <string name="choose_bed_type_success">變更床型成功</string>-->
     <string name="try_again">請再試一次</string>
     <string name="error_connect_device_state">目前尚未連接設備,正在嘗試自動連接....</string>
     <string name="heart_rate_unit">bpm</string>
@@ -265,5 +265,14 @@
     <string name="drawer_set_up">Set Up</string>
 
     <string name="exception_notification">Exception Notification</string>
+    <string name="not_open_wifi">Make sure your WiFi is turned on.</string>
+    <string name="no_supports_check_wifi"> The function supports devices running the Android 10 or above.</string>
+    <string name="no_open_bluetooth">Make sure Bluetooth is turned on.</string>
+    <string name="temperature_calibration">Temperature Calibration</string>
+    <string name="temperature_calibration_hit">Enter temperature between 35&#8211;42.</string>
+    <string name="error_temperature_calibration_isBlank">Please fill in the temperature.</string>
+    <string name="calibration_success">Calibrated Success.</string>
+    <string name="calibration_failed">Calibration Failed.</string>
+
 
 </resources>

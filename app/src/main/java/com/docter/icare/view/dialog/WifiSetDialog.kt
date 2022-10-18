@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import com.docter.icare.utils.Coroutines.main
 import com.docter.icare.utils.InputException
+import com.docter.icare.utils.hideKeyboard
 import com.docter.icare.utils.isSpecialSymbols
 import com.docter.icare.utils.toast
 import io.reactivex.rxjava3.core.Observable
@@ -52,6 +53,7 @@ class WifiSetDialog(
                     main {
                         clean()
                         popupWindow.dismiss()
+                        hideKeyboard()
                         clickListener.onCancelClick()
                     }
                 }
@@ -69,6 +71,7 @@ class WifiSetDialog(
                             popupWindow.dismiss()
                             clean()
                         } }
+                    hideKeyboard()
                     clickListener.onConfirmClick(etWifiAccount.text.toString(), etWifiPassword.text.toString())
                 }.onFailure {
                     it.printStackTrace()
@@ -114,6 +117,8 @@ class WifiSetDialog(
             etWifiPassword.setText("")
         }
     }
+
+    private fun hideKeyboard() = view?.let { activity.hideKeyboard(it) }
 
     interface OnClickListener {
         fun onConfirmClick(wifiAccount: String, wifiPassword: String)

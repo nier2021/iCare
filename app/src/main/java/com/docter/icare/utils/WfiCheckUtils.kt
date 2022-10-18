@@ -2,8 +2,10 @@ package com.docter.icare.utils
 
 import android.content.Context
 import android.net.*
+import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSpecifier
 import android.util.Log
+import androidx.core.content.getSystemService
 
 
 class WfiCheckUtils(
@@ -92,6 +94,11 @@ class WfiCheckUtils(
         Log.e("DeviceFragment","unregisterNetWork")
         connectivityManager?.bindProcessToNetwork(null)
         connectivityManager?.unregisterNetworkCallback(networkCallback)
+    }
+
+    fun isWifiEnabled(): Boolean {
+        val wifiManager: WifiManager = appContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        return wifiManager.isWifiEnabled
     }
 
 

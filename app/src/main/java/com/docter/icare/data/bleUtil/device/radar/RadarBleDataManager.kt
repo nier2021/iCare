@@ -92,6 +92,11 @@ class RadarBleDataManager(context: Context) : BleConnectListener {
         radarBleManager?.writeValue(regulateData)
     }
 
+    fun writeTemperatureCalibration(TemperatureData: ByteArray) {
+        Log.i("RadarBleDataManager","writeTemperatureCalibration TemperatureData=>${TemperatureData.toHexStringSpace()}")
+        radarBleManager?.writeValue(TemperatureData)
+    }
+
     var bleRadarDataListener: BleDataReceiveListener? = null
 
     private val dataReceiveListener = object : BleDataReceiveListener {
@@ -183,6 +188,11 @@ class RadarBleDataManager(context: Context) : BleConnectListener {
         Log.i("RadarBleDataManager","onConnectFailed")
         isConnect = false
     }
+
+
+
+    fun isBluetoothEnabled() = radarBleManager?.isBluetoothEnabled()
+
 
 }
 

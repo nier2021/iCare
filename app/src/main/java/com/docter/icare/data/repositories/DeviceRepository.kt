@@ -1,7 +1,9 @@
 package com.docter.icare.data.repositories
 
 import android.Manifest
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
@@ -13,7 +15,6 @@ import com.docter.icare.data.bleUtil.device.radar.RadarBleDataManager
 import com.docter.icare.data.bleUtil.bleInterface.BleConnectListener
 import com.docter.icare.data.bleUtil.bleInterface.BleDataReceiveListener
 import com.docter.icare.data.bleUtil.bleInterface.BleScanCallback
-import com.docter.icare.data.bleUtil.device.radar.RadarBleManager
 import com.docter.icare.data.entities.view.AccountInfo
 import com.docter.icare.data.entities.view.DeviceEntity
 import com.docter.icare.data.network.SafeApiRequest
@@ -23,6 +24,7 @@ import com.docter.icare.data.resource.*
 import com.docter.icare.utils.InputException
 import com.docter.icare.utils.SidException
 import com.docter.icare.utils.isSpecialSymbols
+import com.docter.icare.utils.toHexStringSpace
 import okhttp3.internal.toHexString
 
 class DeviceRepository (
@@ -106,11 +108,11 @@ class DeviceRepository (
                     Log.i("DeviceRepository","deviceBindingRequest bind success type==1")
                     Log.i("DeviceRepository","deviceBindingRequest bind success  device.name=>${device.name}")
                     Log.i("DeviceRepository","deviceBindingRequest bind success  accountId=>${it.accountId}")
-                    saveDevice(type, deviceType,  device.address, device.name,  it.accountId)
+                    saveDevice(type, deviceType,  device.address, device.name,  it.accountId, "35")
 //                    preference.set(BED_TYPE,1)
                 } else {
                     Log.i("DeviceRepository","deviceBindingRequest bind success type==0")
-                    saveDevice(type, deviceType,"","" , -1)
+                    saveDevice(type, deviceType,"","" , -1,""  )
 //                    preference.set(BED_TYPE,-1)
                 }
             }else{
@@ -127,14 +129,15 @@ class DeviceRepository (
 
     fun bleDisconnect(deviceType: String) = if (deviceType == "Radar") radarBleDataManager.disconnect() else airBleDataManager.disconnect()
 
-    private fun saveDevice(type: Int,deviceType: String, deviceAddress: String, deviceName: String, accountId: Int){
+    private fun saveDevice(type: Int,deviceType: String, deviceAddress: String, deviceName: String, accountId: Int, temperature: String){
         if (deviceType == "Radar") {
             Log.i("DeviceRepository","saveDevice deviceName=>$deviceName")
             with(preference){
                 set(RADAR_DEVICE_MAC, deviceAddress)
                 set(RADAR_DEVICE_NAME, deviceName)
                 set(RADAR_DEVICE_ACCOUNT_ID,accountId)
-                if (type == 1) set(BED_TYPE,1) else set(BED_TYPE,-1)
+//                if (type == 1) set(BED_TYPE,1) else set(BED_TYPE,-1)
+                preference.set(RADAR_TEMPERATURE,temperature)
             }
         } else {
             Log.i("DeviceRepository","saveDevice ------")
@@ -155,7 +158,8 @@ class DeviceRepository (
 //                Log.i("DeviceRepository","getDeviceInfo name=>${deviceEntity.deviceName}")
                 deviceEntity.wifiAccount.value = getString(WIFI_NAME,"")
                 deviceEntity.wifiPassword = getString(WIFI_PASS,"")
-                deviceEntity.bedType = getInt(BED_TYPE,-1)
+//                deviceEntity.bedType = getInt(BED_TYPE,-1)
+                deviceEntity.temperatureName.value = getString(RADAR_TEMPERATURE,"")
             }
         }else{
             deviceEntity.type.value = DeviceEntity.AIR
@@ -312,6 +316,35 @@ class DeviceRepository (
         }
     }
 
+    fun setTemperatureCalibration(temperature: String){
+        var isSend = false
+        Log.i("DeviceRepository", "setTemperatureCalibration")
+        val temp: Int = (temperature.toFloat() * 100).toInt()
+        val hexString: String = temp.toHexString()
+        Log.i("DeviceRepository", "setTemperatureCalibration hexString=>$hexString")
+        val tl: String = hexString.substring(hexString.length-2,hexString.length)
+        val th: String  = hexString.substring(0,hexString.length-2)
+        Log.i("DeviceRepository", "setTemperatureCalibration th=>$th \n tl=>$tl")
+        val zeroTl = if (tl.length == 1) "0$tl" else tl
+        val zeroTh = if (th.length == 1) "0$th" else th
+        Log.i("DeviceRepository", "setTemperatureCalibration zeroTh=>$zeroTh \n zeroTl=>$zeroTl")
+        val hexKTl = zeroTl.toInt(16)
+        val hexKTh = zeroTh.toInt(16)
+        Log.i("DeviceRepository", "setTemperatureCalibration hexKTh=>$hexKTh \n hexKTl=>$hexKTl")
+        val regulateData = "TMP".toByteArray()
+        val testByteArray: ByteArray = regulateData+ hexKTh.toByte() + hexKTl.toByte()
+        Log.i("DeviceRepository", "setTemperatureCalibration testByteArray=>${testByteArray.toHexStringSpace()}")
+
+        if (!isSend) {
+            radarBleDataManager.writeTemperatureCalibration(testByteArray)
+            Log.i("DeviceRepository","setTemperatureCalibration ****")
+            preference.set(RADAR_TEMPERATURE,temperature)
+            isSend = true
+
+        }
+
+    }
+
     fun setSettingReceiveCallback(
         bleSettingReceiveCallback: BleDataReceiveListener
     ) {
@@ -321,6 +354,13 @@ class DeviceRepository (
     fun setType(type: String): Int {
          return if (type == "Radar") DeviceEntity.RADAR else DeviceEntity.AIR
     }
+
+
+    fun isBluetoothEnabled(context: Context): Boolean{
+        val adapter: BluetoothAdapter by lazy { (context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter }
+        return adapter.isEnabled
+    }
+
 
 //    fun getRadarBleDataReceive() = radarBleDataManager.onRadarBleDataReceive()
 //    var bleSettingReceiveCallback: RadarBleDataManager? = null

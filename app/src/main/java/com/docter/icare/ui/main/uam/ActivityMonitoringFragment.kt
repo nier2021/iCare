@@ -86,46 +86,46 @@ class ActivityMonitoringFragment : BaseFragment() {
     private fun connectionWebSocket(accountId: Int){
 //        //後端傳送4狀態正躺 側躺 坐在床邊 離床
 //        //狀態顏色&&圖片 在床&&側躺＆＆ 藍色 圖相同 值：狀態顯示文字不同 ; 離床&&無人：顏色＝>灰色 圖不同 無值--(直接顯示不管是否有收到呼吸等值);
-        lifecycleScope.launch {
-            try {
-                viewModel.startSocket(requireContext() ,accountId).consumeEach {
-                    if (it.exception == null && it.error == null && it.bioRadar != null) {
-                        binding.contentTv.text = "會員id:${it.bioRadar.accountId}\n 數據時間:${it.bioRadar.time}\n 雷達狀態：${it.bioRadar.radar_state}\n" +
-                                "距離:${it.bioRadar.distance}\n 心率:${it.bioRadar.heart_rate}\n 在床情況：${it.bioRadar.bed_state}\n 呼吸頻率：${it.bioRadar.breath_state}\n"
-                    } else {
-                        with(binding.root){
-                            when{
-                                it.exception != null -> snackbar(it.exception.message!!)
-                                it.error != null -> snackbar(it.error)
-                                else -> snackbar("資料存取錯誤...")
-                            }
-                        }
-                    }
-                }
-
-            } catch (ex: java.lang.Exception) {
-//                    onSocketError(ex)
-                binding.root.snackbar(ex.message!!)
-            }
-        }
+//        lifecycleScope.launch {
+//            try {
+//                viewModel.startSocket(requireContext() ,accountId).consumeEach {
+//                    if (it.exception == null && it.error == null && it.bioRadar != null) {
+//                        binding.contentTv.text = "會員id:${it.bioRadar.accountId}\n 數據時間:${it.bioRadar.time}\n 雷達狀態：${it.bioRadar.radar_state}\n" +
+//                                "距離:${it.bioRadar.distance}\n 心率:${it.bioRadar.heart_rate}\n 在床情況：${it.bioRadar.bed_state}\n 呼吸頻率：${it.bioRadar.breath_state}\n"
+//                    } else {
+//                        with(binding.root){
+//                            when{
+//                                it.exception != null -> snackbar(it.exception.message!!)
+//                                it.error != null -> snackbar(it.error)
+//                                else -> snackbar("資料存取錯誤...")
+//                            }
+//                        }
+//                    }
+//                }
+//
+//            } catch (ex: java.lang.Exception) {
+////                    onSocketError(ex)
+//                binding.root.snackbar(ex.message!!)
+//            }
+//        }
 
     }
 
 
     private fun onClose(){
         Log.i("ActivityMonitoringFragment","onClose")
-        lifecycleScope.launch {
-            runCatching {
-                viewModel.stopSocket()
-            }.onSuccess {
-                binding.contentTv.text ="已關閉"
-                Log.i("ActivityMonitoringFragment","onClose  onSuccess")
-            }.onFailure {
-                Log.i("ActivityMonitoringFragment","onClose onFailure e=>${it.message}")
-                it.printStackTrace()
-                binding.root.snackbar(it)
-            }
-        }
+//        lifecycleScope.launch {
+//            runCatching {
+//                viewModel.stopSocket()
+//            }.onSuccess {
+//                binding.contentTv.text ="已關閉"
+//                Log.i("ActivityMonitoringFragment","onClose  onSuccess")
+//            }.onFailure {
+//                Log.i("ActivityMonitoringFragment","onClose onFailure e=>${it.message}")
+//                it.printStackTrace()
+//                binding.root.snackbar(it)
+//            }
+//        }
     }
 
 

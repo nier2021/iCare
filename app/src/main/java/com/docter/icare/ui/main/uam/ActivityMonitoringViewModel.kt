@@ -17,8 +17,8 @@ class ActivityMonitoringViewModel (
     val entity = BedsideMonitorEntity()
     fun getDeviceAccountId() = radarRepository.getDeviceAccountId()
 
-    fun startSocket(context: Context ,accountId: Int): Channel<SocketUpdate> =
-        radarRepository.startSocket(context,accountId)
-
-    fun stopSocket() = radarRepository.closeSocket()
+//    fun startSocket(context: Context ,accountId: Int): Channel<SocketUpdate> =
+//        radarRepository.startSocket(context,accountId)
+//
+//    fun stopSocket() = radarRepository.closeSocket()
 }

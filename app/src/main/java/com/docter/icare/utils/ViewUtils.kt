@@ -1,9 +1,11 @@
 package com.docter.icare.utils
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.view.View
 import android.view.Window
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.view.WindowInsetsCompat.Type.ime
 import androidx.core.view.WindowInsetsControllerCompat
@@ -44,4 +46,10 @@ fun Window.hideSoftKeyboard() = with(WindowInsetsControllerCompat(this, findView
 
 fun Intent.clearStack() {
     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+}
+
+
+fun Context.hideKeyboard(view: View) {
+    val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
 }

@@ -18,6 +18,8 @@ data class BedsideMonitorEntity(
     val iconBodyTemperature: MutableLiveData<Drawable> = MutableLiveData(null),//呼吸頻率圖示
     var bodyTemperature: MutableLiveData<String> = MutableLiveData(""),//體溫
     var bodyTemperatureTextColor: MutableLiveData<Int> = MutableLiveData(-1),//體溫狀態顏色
+    var isHasTemperature :MutableLiveData<Boolean> = MutableLiveData(false),//是否有溫度裝置
+    val isShowRefresh: MutableLiveData<Boolean> = MutableLiveData(false)//是否有顯示Refresh按鈕
 //    var iconBedStatus: Drawable? = null,//中間圖示
 //    var frameBedStatus: Drawable? = null,//外框圖示
 //    var textBedStatus: String = "",//床上狀態

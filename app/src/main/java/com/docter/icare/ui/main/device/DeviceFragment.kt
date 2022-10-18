@@ -1,11 +1,6 @@
 package com.docter.icare.ui.main.device
 
 import android.app.Activity
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
-import android.net.wifi.WifiConfiguration
-import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -53,11 +48,15 @@ class DeviceFragment : BaseFragment() {
 
     private val connectProgressDialog: CustomProgressDialog by lazy { CustomProgressDialog(requireActivity(), R.string.connecting) }
 
-    private val chooseBedTypeDialog: ChooseBedTypeDialog by lazy { ChooseBedTypeDialog(requireContext()) }
+//    private val chooseBedTypeDialog: ChooseBedTypeDialog by lazy { ChooseBedTypeDialog(requireContext()) }
 
     private val wifiSetDialog: WifiSetDialog by lazy { WifiSetDialog(requireContext()) }
 
+    private val temperatureSetDialog: TemperatureSetDialog by lazy { TemperatureSetDialog(requireContext()) }
+
     private val toastAlertDialog: ToastAlertDialog by lazy { ToastAlertDialog(requireContext()) }
+
+    private val setProgressDialog: CustomProgressDialog by lazy { CustomProgressDialog( requireActivity(), R.string.set_up) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -82,7 +81,7 @@ class DeviceFragment : BaseFragment() {
 
         with(viewModel){
             appContext.value = requireContext()
-            getDeviceInfo(requireContext())
+            getDeviceInfo()
 
             isDataSend.observe(viewLifecycleOwner){
                 if (it){
@@ -97,13 +96,17 @@ class DeviceFragment : BaseFragment() {
             }
             throwMessage.observe(viewLifecycleOwner) { showThrowMessage(it) }
 
-            bedTypeChangeFlag.observe(viewLifecycleOwner){
-//               if (it) viewModel.dataSend(1)
-                if (it) viewModel.setAppendDistance(requireContext())
+//            bedTypeChangeFlag.observe(viewLifecycleOwner){
+//                if (it) viewModel.setAppendDistance(requireContext())
 
 //                   Log.i("DeviceFragment","發送藍芽修改床型=>${bedType.value}")
+//            }
+
+            isSetProgress.observe(viewLifecycleOwner){
+                if (it) setProgressDialog.show() else setProgressDialog.dismiss()
             }
         }
+
 
         viewModel.setSettingReceiveCallback()
 
@@ -118,55 +121,66 @@ class DeviceFragment : BaseFragment() {
             super.onBackClick(activity)
         }
 
-//        override fun onBackClick(activity: Activity) = when {
-//            chooseAddDialog.isShowing() -> chooseAddDialog.dismiss()
-//            else -> super.onBackClick(activity)
-//        }
-//
-//        override fun onAddClick() = chooseAddDialog.show()
     }
 
     override fun onClick(view: View) {
         super.onClick(view)
-        when(view){
-            binding.layoutBtnDeviceBind.root ->{
-                if (viewModel.entity.deviceName.isNotEmpty()){
-                    if (!confirmUnBindDeviceDialog.isShowing()) confirmUnBindDeviceDialog.apply {
-                        setMessage(getString(R.string.confirm_unbind_device_message,viewModel.entity.deviceName))
-                        setPositiveButton(R.string.yes_text){ _->
-                            unBindDevice()
-                        }
-                    }.show()
-                }else{
-                    findNavController().navigate(R.id.deviceScanFragment, bundleOf("deviceType" to viewModel.entity.deviceType))
+//        if (activityViewModel.isBluetoothEnabled() == true){
+        if (activityViewModel.isBluetoothEnabled(context = requireContext().applicationContext)){
+            when(view){
+                binding.layoutBtnDeviceBind.root ->{
+                    if (viewModel.entity.deviceName.isNotEmpty()){
+                        if (!confirmUnBindDeviceDialog.isShowing()) confirmUnBindDeviceDialog.apply {
+                            setMessage(getString(R.string.confirm_unbind_device_message,viewModel.entity.deviceName))
+                            setPositiveButton(R.string.yes_text){ _->
+                                unBindDevice()
+                            }
+                        }.show()
+                    }else{
+                        findNavController().navigate(R.id.deviceScanFragment, bundleOf("deviceType" to viewModel.entity.deviceType))
+                    }
                 }
-            }
 
+                binding.layoutBtnWifiBind.root -> {
+                    main{
+                        if (!wifiSetDialog.isShowing()) wifiSetDialog.apply {
+                            setClickListener(wifiSetDialogClickListener)
+                        }.show()
+                    }
 
-            binding.layoutBtnBedType.root ->
-                if (viewModel.isConnect()) {
-                    doBedType()
-                }else {
-                    context?.toast(getString(R.string.error_connect_device_state))
-                    viewModel.runBleConnect()
-                    with(viewModel){
-                        runBleConnect()
-                        isBleConnectSuccess.observe(viewLifecycleOwner){
-                            if (it && viewModel.isConnect())  doBedType()
+                }
+
+//                binding.layoutBtnBedType.root ->
+//                    if (viewModel.isConnect()) {
+//                        doBedType()
+//                    }else {
+//                        context?.toast(getString(R.string.error_connect_device_state))
+//                        viewModel.runBleConnect()
+//                        with(viewModel){
+//                            runBleConnect()
+//                            isBleConnectSuccess.observe(viewLifecycleOwner){
+//                                if (it && viewModel.isConnect())  doBedType()
+//                            }
+//                        }
+//                    }
+
+                binding.layoutBtnTemperatureCalibration.root -> {
+                    if (viewModel.isConnect()) {
+                        doTemperature()
+                    }else {
+                        context?.toast(getString(R.string.error_connect_device_state))
+                        viewModel.runBleConnect()
+                        with(viewModel){
+                            runBleConnect()
+                            isBleConnectSuccess.observe(viewLifecycleOwner){
+                                if (it && viewModel.isConnect())  doTemperature()
+                            }
                         }
                     }
                 }
 
-
-            binding.layoutBtnWifiBind.root -> {
-                main{
-                    if (!wifiSetDialog.isShowing()) wifiSetDialog.apply {
-                        setClickListener(wifiSetDialogClickListener)
-                    }.show()
-                }
-
             }
-        }
+        } else binding.root.snackbar(R.string.no_open_bluetooth)
     }
 
     private val wifiSetDialogClickListener = object : WifiSetDialog.OnClickListener{
@@ -185,12 +199,37 @@ class DeviceFragment : BaseFragment() {
 
     }
 
+    private val temperatureSetDialogClickListener = object : TemperatureSetDialog.OnClickListener{
+        override fun onConfirmClick(temperature: String) {
+            Log.i("DeviceFragment","temperatureSetDialogClickListener onConfirmClick temperature=>$temperature")
+            if (temperature.isNotBlank() && temperature.toFloat() in 35f..42f){
+                main {
+                    viewModel.setTemperatureCalibration(temperature)
+                }
+            }
+        }
 
-    private fun doBedType(){
-        if (!chooseBedTypeDialog.isShowing()) chooseBedTypeDialog.apply {
-            saveBedType(viewModel.setBedType.value!!)
-            setClickListener(chooseBedTypeDialogClickListener)
-        }.show()
+        override fun onCancelClick() {
+            Log.i("DeviceFragment","temperatureSetDialogClickListener onCancelClick")
+        }
+
+    }
+
+
+//    private fun doBedType(){
+//        if (!chooseBedTypeDialog.isShowing()) chooseBedTypeDialog.apply {
+////            saveBedType(viewModel.setBedType.value!!)
+//            setClickListener(chooseBedTypeDialogClickListener)
+//        }.show()
+//    }
+
+
+    private fun doTemperature(){
+        main {
+            if (!temperatureSetDialog.isShowing()) temperatureSetDialog.apply {
+                setClickListener(temperatureSetDialogClickListener)
+            }.show()
+        }
     }
 
     private fun unBindDevice(){
@@ -203,19 +242,22 @@ class DeviceFragment : BaseFragment() {
                 Log.i("DeviceFragment","解綁成功")
 //                requireContext().toast(requireContext().getString(R.string.unbind_success))
                 binding.root.snackbar(getString(R.string.unbind_success))
-                viewModel.getDeviceInfo(requireContext())
+                viewModel.getDeviceInfo()
                 viewModel.bleDisconnect()
                 with(binding){
                     layoutBtnDeviceBind.title.text = getString(R.string.device_setting)
                     layoutBtnDeviceBind.icon.setImageResource(R.drawable.icon_device_bind)
                     tvDeviceName.text = ""
                     layoutDeviceName.visibility = View.GONE
-//                    viewModel.entity.isWifiBind.postValue(false)
-                    layoutBtnBedType.root.background = ContextCompat.getDrawable(requireContext(),R.drawable.background_button_grey)
-                    layoutBtnBedType.root.isClickable = false
+//                    layoutBtnBedType.root.background = ContextCompat.getDrawable(requireContext(),R.drawable.background_button_grey)
+//                    layoutBtnBedType.root.isClickable = false
+                    layoutBtnTemperatureCalibration.root.background = ContextCompat.getDrawable(requireContext(),R.drawable.background_button_grey)
+                    layoutBtnTemperatureCalibration.root.isClickable = false
+                    activityViewModel.isChange(true)//webSocket
                 }
             }.onFailure {
                 main{ connectProgressDialog.dismiss() }
+                viewModel.bleDisconnect()
                 Log.i("DeviceFragment","解綁失敗")
 //                requireContext().toast(requireContext().getString(R.string.unbind_failed))
                 it.printStackTrace()
@@ -225,18 +267,18 @@ class DeviceFragment : BaseFragment() {
     }
 
 
-    private val chooseBedTypeDialogClickListener = object : ChooseBedTypeDialog.OnClickListener{
-        override fun onConfirmClick(changeData: Boolean, chooseBedType: Int) {
-//            Log.i("DeviceFragment","changeData=>$changeData 取得床型=>$chooseBedType")
-            with(viewModel){
-                if (changeData) {
-                    setBedType.value = chooseBedType
-                    bedTypeChangeFlag.value = changeData
-                }
-//                Log.i("DeviceFragment","選取床型=>${viewModel.bedType.value}")
-            }
-        }
-    }
+//    private val chooseBedTypeDialogClickListener = object : ChooseBedTypeDialog.OnClickListener{
+//        override fun onConfirmClick(changeData: Boolean, chooseBedType: Int) {
+////            Log.i("DeviceFragment","changeData=>$changeData 取得床型=>$chooseBedType")
+//            with(viewModel){
+//                if (changeData) {
+////                    setBedType.value = chooseBedType
+//                    bedTypeChangeFlag.value = changeData
+//                }
+////                Log.i("DeviceFragment","選取床型=>${viewModel.bedType.value}")
+//            }
+//        }
+//    }
 
     private fun showThrowMessage(
         throwMessageData: ToastAlertEntity
@@ -253,24 +295,19 @@ class DeviceFragment : BaseFragment() {
         viewModel.throwMessage.value = ToastAlertEntity()
     }
 
-//    private fun showThrowMessage(
-//        message: String
-//    ) {
-//        if (message.isBlank()) return
-//
-//        binding.root.snackbar(message)
-//
-//        viewModel.throwMessage.value = ""
-//    }
-
 
     private fun connectToWifi(ssid: String, password:String){
         main {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                 Log.i("DeviceFragment","connectToWifi < Build.VERSION_CODES.Q")
-                context?.toast("請用android 10以上版本")
+                binding.root.snackbar(R.string.no_supports_check_wifi)
             } else {
-                WfiCheckUtils(context = requireContext(),wfiCheckUtilsCallBack = wfiCheckUtilsCallBack).connectToWifi(ssid = ssid, password = password)
+                val wfiCheckUtils = WfiCheckUtils(context = requireContext(),wfiCheckUtilsCallBack = wfiCheckUtilsCallBack)
+                if (wfiCheckUtils.isWifiEnabled()){
+                    wfiCheckUtils.connectToWifi(ssid = ssid, password = password)
+                }else{
+                    binding.root.snackbar(R.string.not_open_wifi)
+                }
             }
 
         }
@@ -301,92 +338,6 @@ class DeviceFragment : BaseFragment() {
         }
 
     }
-
-//    //wifi
-//    var connectivityManager: ConnectivityManager ?= null
-//
-//    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
-//        override fun onAvailable(network: Network) {
-//            super.onAvailable(network)
-//            Log.i("DeviceFragment","networkCallback onAvailable network=>$network")
-//            connectivityManager?.bindProcessToNetwork(network)
-//
-//        }
-//
-//        override fun onLost(network: Network) {
-//            super.onLost(network)
-//            Log.i("DeviceFragment","networkCallback onLost network=>$network")
-//            unregisterNetWork()
-//        }
-//
-//        override fun onLosing(network: Network, maxMsToLive: Int) {
-//            super.onLosing(network, maxMsToLive)
-//            Log.i("DeviceFragment","networkCallback onLosing network=>$network \n maxMsToLive=>$maxMsToLive")
-//        }
-//
-//        override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
-//            super.onLinkPropertiesChanged(network, linkProperties)
-//            Log.i("DeviceFragment","networkCallback onLinkPropertiesChanged network=>$network \n linkProperties=>$linkProperties")
-//            main {
-//                unregisterNetWork()
-//            }
-//        }
-//
-//        override fun onCapabilitiesChanged(
-//            network: Network,
-//            networkCapabilities: NetworkCapabilities
-//        ) {
-//            super.onCapabilitiesChanged(network, networkCapabilities)
-//            Log.i("DeviceFragment","networkCallback onCapabilitiesChanged network=>$network \n networkCapabilities=>$networkCapabilities")
-//        }
-//
-//        override fun onUnavailable() {
-//            super.onUnavailable()
-//            Log.i("DeviceFragment","networkCallback onUnavailable")
-//            //失敗
-//            binding.root.snackbar(getString(R.string.error_wifi_acc_pass_incorrect))
-//        }
-//
-//        override fun onBlockedStatusChanged(network: Network, blocked: Boolean) {
-//            super.onBlockedStatusChanged(network, blocked)
-//            Log.i("DeviceFragment","networkCallback onBlockedStatusChanged network=>$network \n blocked=>$blocked")
-//        }
-//
-//    }
-//
-//    private fun connectToWifi(ssid: String, password:String) {
-//
-//        val wifiNetworkSpecifier = WifiNetworkSpecifier.Builder()
-//            .setSsid(ssid)
-////            .setSsidPattern(PatternMatcher(ssid,PatternMatcher.PATTERN_LITERAL))
-//            .setWpa2Passphrase(password)
-//            .build()
-//
-//        val networkRequest = NetworkRequest.Builder()
-//            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-//            .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED)
-////            .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-////            .addCapability(NetworkCapabilities.NET_CAPABILITY_TRUSTED)
-////            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-//            .setNetworkSpecifier(wifiNetworkSpecifier)
-//            .build()
-//
-//        connectivityManager =
-//            context?.applicationContext!!.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-//
-//        connectivityManager?.registerNetworkCallback(networkRequest,networkCallback )
-//        connectivityManager?.requestNetwork(networkRequest, networkCallback)
-//
-//    }
-//
-//
-//
-//    fun unregisterNetWork(){
-//        Log.e("DeviceFragment","unregisterNetWork")
-//        connectivityManager?.bindProcessToNetwork(null)
-//        connectivityManager?.unregisterNetworkCallback(networkCallback)
-//
-//    }
 
 
 }

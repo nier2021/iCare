@@ -29,6 +29,7 @@ class WebServices {
     //    @ExperimentalCoroutinesApi
     fun startSocket(context: Context, accountId: Int): Channel<SocketUpdate> =
         with(LinkWebSocketListener(context,accountId)) {
+            Log.i("WebServices","startSocket")
             startSocket(this)
             this@with.socketEventChannel
         }
