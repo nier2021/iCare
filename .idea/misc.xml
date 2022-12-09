@@ -17,8 +17,13 @@
         <entry key="app/src/main/res/drawable/background_radio_switch_selector.xml" value="0.255" />
         <entry key="app/src/main/res/drawable/background_welcome.xml" value="0.1985" />
         <entry key="app/src/main/res/drawable/btn_login_white.xml" value="0.255" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.303" />
+        <entry key="app/src/main/res/drawable/icon_activity_monitoring.xml" value="0.303" />
+        <entry key="app/src/main/res/drawable/icon_air_quality_index.xml" value="0.303" />
+        <entry key="app/src/main/res/drawable/icon_already_login.xml" value="0.303" />
         <entry key="app/src/main/res/drawable/icon_arrow_drop_down.xml" value="0.1985" />
         <entry key="app/src/main/res/drawable/icon_arrow_drop_down_transparent.xml" value="0.1985" />
+        <entry key="app/src/main/res/drawable/icon_arrow_drop_up.xml" value="0.303" />
         <entry key="app/src/main/res/drawable/icon_arrow_drop_up_transparent.xml" value="0.1985" />
         <entry key="app/src/main/res/drawable/icon_back.xml" value="0.1985" />
         <entry key="app/src/main/res/drawable/icon_backgroud_device_bedside_image.xml" value="0.198" />
@@ -26,7 +31,11 @@
         <entry key="app/src/main/res/drawable/icon_background_device_air_quality_text.xml" value="0.198" />
         <entry key="app/src/main/res/drawable/icon_background_device_bedside_image.xml" value="0.198" />
         <entry key="app/src/main/res/drawable/icon_bed.xml" value="0.1985" />
+        <entry key="app/src/main/res/drawable/icon_bed_deserted.xml" value="0.303" />
+        <entry key="app/src/main/res/drawable/icon_bed_deserted_round.xml" value="0.303" />
         <entry key="app/src/main/res/drawable/icon_bed_small.xml" value="0.198" />
+        <entry key="app/src/main/res/drawable/icon_bed_type_large.xml" value="0.303" />
+        <entry key="app/src/main/res/drawable/icon_bed_type_small.xml" value="0.303" />
         <entry key="app/src/main/res/drawable/icon_bedside_monitor.xml" value="0.303" />
         <entry key="app/src/main/res/drawable/icon_body_temperature_blue.xml" value="0.198" />
         <entry key="app/src/main/res/drawable/icon_body_temperature_red.xml" value="0.198" />
@@ -36,23 +45,35 @@
         <entry key="app/src/main/res/drawable/icon_device_bedside_image.xml" value="0.1985" />
         <entry key="app/src/main/res/drawable/icon_device_bedside_text.xml" value="0.198" />
         <entry key="app/src/main/res/drawable/icon_device_bind.xml" value="0.255" />
+        <entry key="app/src/main/res/drawable/icon_device_thermostat_w.xml" value="0.303" />
         <entry key="app/src/main/res/drawable/icon_device_unbind.xml" value="0.165" />
         <entry key="app/src/main/res/drawable/icon_drawer_about.xml" value="0.1985" />
         <entry key="app/src/main/res/drawable/icon_drawer_device.xml" value="0.303" />
+        <entry key="app/src/main/res/drawable/icon_drawer_person.xml" value="0.303" />
+        <entry key="app/src/main/res/drawable/icon_drawer_set.xml" value="0.303" />
         <entry key="app/src/main/res/drawable/icon_ecg.xml" value="0.303" />
+        <entry key="app/src/main/res/drawable/icon_edit.xml" value="0.303" />
         <entry key="app/src/main/res/drawable/icon_empty_portrait.xml" value="0.255" />
         <entry key="app/src/main/res/drawable/icon_error_device.xml" value="0.1985" />
+        <entry key="app/src/main/res/drawable/icon_exception.xml" value="0.303" />
         <entry key="app/src/main/res/drawable/icon_get_out_bed.xml" value="0.1985" />
+        <entry key="app/src/main/res/drawable/icon_get_out_bed_alert.xml" value="0.303" />
+        <entry key="app/src/main/res/drawable/icon_get_out_bed_alert_round.xml" value="0.303" />
+        <entry key="app/src/main/res/drawable/icon_get_out_bed_round.xml" value="0.303" />
         <entry key="app/src/main/res/drawable/icon_heart_rate_blue.xml" value="0.198" />
         <entry key="app/src/main/res/drawable/icon_heart_rate_red.xml" value="0.198" />
         <entry key="app/src/main/res/drawable/icon_in_bed.xml" value="0.255" />
+        <entry key="app/src/main/res/drawable/icon_in_bed_round.xml" value="0.303" />
         <entry key="app/src/main/res/drawable/icon_logo.xml" value="0.1985" />
         <entry key="app/src/main/res/drawable/icon_main_menu.xml" value="0.198" />
         <entry key="app/src/main/res/drawable/icon_notyet_login.xml" value="0.1985" />
+        <entry key="app/src/main/res/drawable/icon_refresh.xml" value="0.303" />
         <entry key="app/src/main/res/drawable/icon_scan.xml" value="0.1975" />
+        <entry key="app/src/main/res/drawable/icon_side_bed.xml" value="0.303" />
         <entry key="app/src/main/res/drawable/icon_side_bed_round.xml" value="0.255" />
         <entry key="app/src/main/res/drawable/icon_unbind_device.xml" value="0.1985" />
         <entry key="app/src/main/res/drawable/icon_unbind_device_round.xml" value="0.1985" />
+        <entry key="app/src/main/res/drawable/icon_wifi_link.xml" value="0.303" />
         <entry key="app/src/main/res/drawable/line_primary.xml" value="0.1975" />
         <entry key="app/src/main/res/drawable/selector_radio_switch_text_color.xml" value="0.255" />
         <entry key="app/src/main/res/drawable/test.xml" value="0.255" />

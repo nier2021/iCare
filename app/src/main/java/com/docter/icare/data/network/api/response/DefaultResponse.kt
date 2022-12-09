@@ -5,12 +5,10 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class Message(
+data class DefaultResponse(
+    @SerializedName("success")
+    val success: Int,
 
-    @SerializedName("ch")
-    val ch: String,
-
-    @SerializedName("en")
-    val en: String
-
-) : Parcelable
+    @SerializedName("message")
+    val message: String,
+): Parcelable

@@ -10,9 +10,11 @@ data class LoginResponse(
     val success: Int,
 
     @SerializedName("message")
-    val message: Message,
+    val message: String,
 
-    @SerializedName("sid")
-    val sid: String
+    @SerializedName("token")
+    val token: String,
 
-) : Parcelable
+    @SerializedName("user")
+    val user: User
+): Parcelable

@@ -2,6 +2,8 @@
 <resources>
     <string name="app_name">iCare</string>
 
+    <string name="no_function">機能はまだ利用できません。</string>
+
     <string name="wifi_setting">Wifi設定</string>
     <string name="device_setting">リンクデバイス</string>
     <string name="regulate_distance">距離を調整する</string>
@@ -205,25 +207,23 @@
     <string name="setup_failed">セットアップに失敗しました!!</string>
     <string name="start_measurement">測定を開始します</string>
 
-    <string name="title">標題</string>
-    <string name="message">訊息</string>
+    <string name="title">タイトル</string>
+    <string name="message">メッセージ</string>
     <string name="warning">注意</string>
-    <string name="yes">是</string>
-    <string name="no">否</string>
-    <string name="ask_permission_again_title">取得權限失敗</string>
-    <string name="ask_permission_again_message">請允許權限，以便App功能正常運作</string>
-    <string name="ask_background_location_permission_again_title">請允許背景位置權限</string>
-    <string name="ask_background_location_permission_again_message">請至應用程式設定修改位置權限，使用App時必須一律允許位置權限，以便背景執行中觸發緊急鈕時能夠取得現在位置。\n\n注意！\n即使應用程式已關閉或未使用，仍然會收集位置數據用於緊急鈕即時位置上傳功能。</string>
-    <string name="ok">好</string>
-    <string name="close">關閉</string>
-    <string name="please_login_again">請重新登入</string>
+    <string name="yes">はい</string>
+    <string name="no">いいえ</string>
+    <string name="ask_permission_again_title">許可の取得に失敗しました</string>
+    <string name="ask_permission_again_message">アプリの機能が正常に動作するように権限を許可してください</string>
+    <string name="ok">OK</string>
+    <string name="close">閉じる</string>
+    <string name="please_login_again">再度ログインしてください</string>
     <string name="person_info">個人情報</string>
-    <string name="open_text">開</string>
-    <string name="close_text">閉</string>
-    <string name="set_bed_title">選擇床型</string>
-    <string name="device_scan">連結設備</string>
-    <string name="confirm_bind_device_message">請確定綁裝置ID為 %s 的裝置嗎？</string>
-    <string name="confirm_unbind_device_message">請確定解綁ID為 %s 的裝置嗎？</string>
+    <string name="open_text">開く</string>
+    <string name="close_text">閉じる</string>
+    <string name="set_bed_title">ベッドタイプを選択</string>
+    <string name="device_scan">デバイスをリンク</string>
+    <string name="confirm_bind_device_message">デバイス ID %s でデバイスをバインドすることを確認してください?</string>
+    <string name="confirm_unbind_device_message">ID %s のデバイスのバインドを解除しますか?</string>
     <string name="failed_connect_device">デバイス接続に失敗しました。</string>
     <string name="check_wifi_set">請確認要將%s裝置連上wifi嗎?</string>
     <string name="bed_type_1_text">小型單人\n80X200公分\n(2.6X6.6台尺)</string>
@@ -233,26 +233,26 @@
     <string name="error_choose_bed_type">你尚未選擇床型！</string>
 <!--    <string name="error_send_bed_type">修改選擇床型失敗！</string>-->
 <!--    <string name="choose_bed_type_success">變更床型成功</string>-->
-    <string name="try_again">請再試一次</string>
-    <string name="error_connect_device_state">目前尚未連接設備,正在嘗試自動連接....</string>
+    <string name="try_again">もう一度お試しください</string>
+    <string name="error_connect_device_state">デバイスはまだ接続されていません。自動接続を試みています....</string>
     <string name="heart_rate_unit">bpm</string>
-    <string name="breath_state_unit">brpm</string>
-    <string name="radar_status_unbind_text">未綁定</string>
-    <string name="lying_lie">正躺</string>
-    <string name="lie_down">側躺</string>
-    <string name="side_bed">坐在床邊</string>
-    <string name="rest_connect_title">重新連線</string>
-    <string name="rest_connect_message">發生異常,是否重新連線?</string>
-    <string name="error_text">發生異常</string>
-    <string name="wifi_link_text">連線中</string>
-    <string name="device_send_error">裝置發送訊號異常</string>
-    <string name="server_error">伺服器發生異常</string>
+    <string name="breath_state_unit">cpm</string>
+    <string name="radar_status_unbind_text">アンバインド</string>
+    <string name="lying_lie">うそ</string>
+    <string name="lie_down">横向き</string>
+    <string name="side_bed">ベッドの横に座る</string>
+    <string name="rest_connect_title">再接続</string>
+    <string name="rest_connect_message">例外が発生しました。再接続しますか?</string>
+    <string name="error_text">例外が発生しました</string>
+    <string name="wifi_link_text">接続中</string>
+    <string name="device_send_error">デバイス送信信号が異常です</string>
+    <string name="server_error">サーバーで例外が発生しました</string>
 
-    <string name="error_wifi_account_empty">wifi帳號不能為空</string>
-    <string name="error_wifi_password_empty">wifi密碼不能為空</string>
-    <string name="error_wifi_length">wifi帳號或密碼只大於8個字元能小於20個字元(全中文不能超過7個字)</string>
-    <string name="error_wifi_special_symbols">wifi帳號或密碼不能有特殊符號(ex:”或,等)</string>
-    <string name="error_wifi_acc_pass_incorrect">連接wifi失敗,名稱或密碼錯誤</string>
+    <string name="error_wifi_account_empty">wifi アカウントを空にすることはできません</string>
+    <string name="error_wifi_password_empty">wifi パスワードを空にすることはできません</string>
+    <string name="error_wifi_length">wifi アカウント番号またはパスワードは 8 文字以上 20 文字未満にする必要があります</string>
+    <string name="error_wifi_special_symbols">wifi アカウントまたはパスワードに特殊記号 (例: やなど) を使用することはできません</string>
+    <string name="error_wifi_acc_pass_incorrect">Wi-Fi に接続できませんでした。名前またはパスワードが間違っています</string>
     <string name="error_login_acc_pass_incorrect">アカウントまたはパスワードが正しくありません</string>
 
     <string name="unknown_error_occurred">不明なエラーが発生しました</string>
@@ -273,5 +273,6 @@
     <string name="error_temperature_calibration_isBlank">温度を記入してください。</string>
     <string name="calibration_success">調整された成功。</string>
     <string name="calibration_failed">キャリブレーションに失敗しました。</string>
+    <string name="response_unauthenticated">リクエストには有効な認証情報がありません。もう一度ログインしてください。</string>
 
 </resources>

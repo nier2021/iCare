@@ -35,4 +35,6 @@ fun ByteArray.toHexStringSpace(): String = when {
 
 fun String.isSpecialSymbols() :Boolean = Regex("[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]").matches(this)
 
+fun String.isHasTemperature(): Boolean = this.isNotBlank() && this.contains("V2")
+
 

@@ -22,22 +22,22 @@ class BedsideMonitorViewModel(
 ) : ViewModel() {
 
     val entity = BedsideMonitorEntity()
-
+    //bed_state:離床狀態,0==離床, 1==正躺, 2==側躺, 3==坐在床邊,
     fun socketData(context: Context, data: SocketUpdate) {
 //        if (data.bioRadar!!.radar_state == "正常") {
 //            Log.i("BedsideMonitorViewModel","socketData")
 //            Log.i("BedsideMonitorViewModel","bed_state=>${data.bioRadar!!.bed_state}")
             if (data.bioRadar != null){
                 //            if (data.bioRadar.distance.toDouble() > 0.1  && data.bioRadar.bed_state != "離床"){
-                if (data.bioRadar.distance.toDouble() > 10 && data.bioRadar.bed_state != "離床"){
-                    when (data.bioRadar.bed_state) {
-                        "正躺", "側躺"-> {
+                if (data.bioRadar.distance.toDouble() > 10 && data.bioRadar.bed_state.toInt() > 0){
+                    when (data.bioRadar.bed_state.toInt()) {
+                        1, 2-> {
                             with(entity) {
                                 iconBedStatus.value = ContextCompat.getDrawable(context, R.drawable.icon_in_bed)
                                 frameBedStatus.value =
                                     ContextCompat.getDrawable(context, R.drawable.icon_in_bed_round)
                                 textBedStatus.value = context.getString(
-                                    if (data.bioRadar.bed_state == "正躺") R.string.lying_lie else R.string.lie_down
+                                    if (data.bioRadar.bed_state.toInt() == 1) R.string.lying_lie else R.string.lie_down
                                 )
                                 textColorBedStatus.value =
                                     ContextCompat.getColor(context, R.color.radar_in_bed_color)
@@ -48,25 +48,44 @@ class BedsideMonitorViewModel(
                                 breathState.value = data.bioRadar.breath_state
                                 breathStateTextColor.value = ContextCompat.getColor(context, R.color.radar_side_bed_color)
                                 //呼吸頻率icon與文字顏色判斷等後端送上下限值在做
-                                bodyTemperature.value = if (data.bioRadar.temperature.isNotBlank()){
-                                    if (data.bioRadar.temperature.toFloat() == -1f)  "--" else  String.format("%.1f", data.bioRadar.temperature.toFloat())
-                                } else ""
-                                if (bodyTemperature.value?.isNotBlank() == true) {
-                                    when(bodyTemperature.value!!.toFloat()) {//傳過來小數兩位 顯示小數一位
+                                if (data.bioRadar.temperature.isNotBlank()) {
+                                    when(data.bioRadar.temperature.toFloat()) {//傳過來小數兩位 顯示小數一位
                                         -1f ->{
+                                            bodyTemperature.value = "--"
                                             bodyTemperatureTextColor.value = ContextCompat.getColor(context, R.color.radar_out_bed_color)
                                             iconBodyTemperature.value =  ContextCompat.getDrawable(context, R.drawable.icon_body_temperature_blue)
                                         }
                                         in 0.0f..38f -> {
+                                            bodyTemperature.value = String.format("%.1f", data.bioRadar.temperature.toFloat())
                                             bodyTemperatureTextColor.value = ContextCompat.getColor(context, R.color.radar_side_bed_color)
                                             iconBodyTemperature.value =  ContextCompat.getDrawable(context, R.drawable.icon_body_temperature_blue)
                                         }
                                         else ->{
+                                            bodyTemperature.value = String.format("%.1f", data.bioRadar.temperature.toFloat())
                                             bodyTemperatureTextColor.value = ContextCompat.getColor(context, R.color.radar_out_bed_color_alert)
                                             iconBodyTemperature.value =  ContextCompat.getDrawable(context, R.drawable.icon_body_temperature_red)
                                         }
                                     }
-                                }
+                                }else  bodyTemperature.value= ""
+//                                bodyTemperature.value = if (data.bioRadar.temperature.isNotBlank()){
+//                                    if (data.bioRadar.temperature.toFloat() == -1f)  "--" else  String.format("%.1f", data.bioRadar.temperature.toFloat())
+//                                } else ""
+//                                if (bodyTemperature.value?.isNotBlank() == true) {
+//                                    when(bodyTemperature.value!!.toFloat()) {//傳過來小數兩位 顯示小數一位
+//                                        -1f ->{
+//                                            bodyTemperatureTextColor.value = ContextCompat.getColor(context, R.color.radar_out_bed_color)
+//                                            iconBodyTemperature.value =  ContextCompat.getDrawable(context, R.drawable.icon_body_temperature_blue)
+//                                        }
+//                                        in 0.0f..38f -> {
+//                                            bodyTemperatureTextColor.value = ContextCompat.getColor(context, R.color.radar_side_bed_color)
+//                                            iconBodyTemperature.value =  ContextCompat.getDrawable(context, R.drawable.icon_body_temperature_blue)
+//                                        }
+//                                        else ->{
+//                                            bodyTemperatureTextColor.value = ContextCompat.getColor(context, R.color.radar_out_bed_color_alert)
+//                                            iconBodyTemperature.value =  ContextCompat.getDrawable(context, R.drawable.icon_body_temperature_red)
+//                                        }
+//                                    }
+//                                }
                             }
                         }
                         else -> {
@@ -90,7 +109,7 @@ class BedsideMonitorViewModel(
                         }
                     }
                 }else{
-                    //離床 距離小於等於10cm
+                    //離床 距離小於等於10cm or 離床
                     with(entity) {
                         iconBedStatus.value = ContextCompat.getDrawable(context, R.drawable.icon_get_out_bed)
                         frameBedStatus.value =
@@ -146,7 +165,7 @@ class BedsideMonitorViewModel(
     }
 
     fun bindDeviceShow(context: Context){
-        Log.i("BedsideMonitorViewModel","closeSocket")
+        Log.i("BedsideMonitorViewModel","bindDeviceShow")
         with(entity) {
             breathState.value = ""
             iconBedStatus.value = ContextCompat.getDrawable(context, R.drawable.icon_wifi_link)

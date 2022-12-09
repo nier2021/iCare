@@ -1,11 +1,12 @@
 <resources>
     <string name="app_name">iCare</string>
 
-    <string name="wifi_setting">Wifi Setting</string>
+    <string name="no_function">No function module has been generated yet.</string>
+
     <string name="device_setting">Device Setting</string>
     <string name="regulate_distance">Regulate Distance</string>
     <string name="logout">Log Out</string>
-    <string name="login">Login</string>
+
     <string name="register">Register</string>
     <string name="enter_account">Please enter account</string>
     <string name="enter_password">Please enter password</string>
@@ -152,8 +153,8 @@
     <string name="new_password">New Password</string>
     <string name="confirm_new_password">Confirm New Password</string>
     <string name="account_is">Account：%s</string>
-    <string name="account_hint">Please Enter 6 to 32 characters </string>
-    <string name="password_hint">Please Enter 6 to 32 characters </string>
+<!--    <string name="account_hint">Please Enter 6 to 32 characters </string>-->
+<!--    <string name="password_hint">Please Enter 6 to 32 characters </string>-->
     <string name="error_old_password_empty">Old password cannot be null.</string>
     <string name="error_new_password_empty">New password cannot be null.</string>
     <string name="error_confirm_new_password">The New password and confirm password do not match.</string>
@@ -205,55 +206,50 @@
     <string name="setup_failed">Setup Failed!!</string>
     <string name="start_measurement">Start Measurement</string>
 
-    <string name="title">標題</string>
-    <string name="message">訊息</string>
-    <string name="warning">注意</string>
+    <string name="title">Title</string>
+    <string name="message">Message</string>
+    <string name="warning">Warning</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="ask_permission_again_title">取得權限失敗</string>
-    <string name="ask_permission_again_message">請允許權限，以便App功能正常運作</string>
-    <string name="ask_background_location_permission_again_title">請允許背景位置權限</string>
-    <string name="ask_background_location_permission_again_message">請至應用程式設定修改位置權限，使用App時必須一律允許位置權限，以便背景執行中觸發緊急鈕時能夠取得現在位置。\n\n注意！\n即使應用程式已關閉或未使用，仍然會收集位置數據用於緊急鈕即時位置上傳功能。</string>
     <string name="ok">OK</string>
     <string name="close">Close</string>
-    <string name="please_login_again">請重新登入</string>
+    <string name="please_login_again">please login again.</string>
     <string name="person_info">Person Information</string>
     <string name="open_text">Open</string>
     <string name="close_text">Close</string>
     <string name="set_bed_title">選擇床型</string>
-    <string name="device_scan">連結設備</string>
-    <string name="confirm_bind_device_message">請確定綁裝置ID為 %s 的裝置嗎？</string>
-    <string name="confirm_unbind_device_message">請確定解綁ID為 %s 的裝置嗎？</string>
+    <string name="device_scan">Search Device</string>
+    <string name="confirm_bind_device_message">Are you sure you want to bind the %s?</string>
+    <string name="confirm_unbind_device_message">re you sure you want to unbind the %s?</string>
     <string name="failed_connect_device">Device connection failed.</string>
-    <string name="check_wifi_set">請確認要將%s裝置連上wifi嗎?</string>
-    <string name="bed_type_1_text">小型單人\n80X200公分\n(2.6X6.6台尺)</string>
-    <string name="bed_type_2_text">單人\n90X190公分\n(3X6.2台尺)</string>
-    <string name="bed_type_3_text">單人\n90X200公分\n(3X6.6台尺)</string>
-    <string name="bed_type_4_text">單人加大\n120X200公分\n(4X6.6台尺)</string>
+    <string name="check_wifi_set">Connect to Wi-Fi networks on your Android device</string>
+    <string name="bed_type_1_text">single size bed\n80X200公分</string>
+    <string name="bed_type_2_text">single size bed\n90X190公分</string>
+    <string name="bed_type_3_text">single size bed\n90X200公分</string>
+    <string name="bed_type_4_text">twin XL size bed\n120X200公分</string>
     <string name="error_choose_bed_type">你尚未選擇床型！</string>
 <!--    <string name="error_send_bed_type">修改選擇床型失敗！</string>-->
 <!--    <string name="choose_bed_type_success">變更床型成功</string>-->
-    <string name="try_again">請再試一次</string>
-    <string name="error_connect_device_state">目前尚未連接設備,正在嘗試自動連接....</string>
+    <string name="try_again">Try Again</string>
+    <string name="error_connect_device_state">Device connection failed! Please click retry or try to re-bind the device from the page.</string>
     <string name="heart_rate_unit">bpm</string>
-    <string name="breath_state_unit">brpm</string>
-    <string name="radar_status_unbind_text">未綁定</string>
-    <string name="lying_lie">正躺</string>
-    <string name="lie_down">側躺</string>
-    <string name="side_bed">坐在床邊</string>
-    <string name="rest_connect_title">重新連線</string>
-    <string name="rest_connect_message">發生異常,是否重新連線?</string>
-    <string name="error_text">發生異常</string>
-    <string name="wifi_link_text">連線中</string>
-    <string name="device_send_error">裝置發送訊號異常</string>
-    <string name="server_error">伺服器發生異常</string>
+    <string name="breath_state_unit">cpm</string>
+    <string name="radar_status_unbind_text">No Device</string>
+    <string name="lying_lie">lying down</string>
+    <string name="lie_down">Side lying</string>
+    <string name="side_bed">Sit on Edge of Bed.</string>
+    <string name="rest_connect_title">An Exception Occurred</string>
+    <string name="rest_connect_message">The connection to the server reset</string>
+    <string name="error_text">The server isn\&#39;t responding.</string>
+    <string name="wifi_link_text">connecting....</string>
+    <string name="device_send_error">The server service is not responding in the device client.</string>
+    <string name="server_error">An exception occurred during the execution of the current web request.</string>
 
-    <string name="error_wifi_account_empty">wifi帳號不能為空</string>
-    <string name="error_wifi_password_empty">wifi密碼不能為空</string>
-    <string name="error_wifi_length">wifi帳號或密碼小於20個字元(全中文不能超過7個字)</string>
-    <string name="error_wifi_special_symbols">wifi帳號或密碼不能有特殊符號(ex:”或,等)</string>
-    <string name="error_wifi_acc_pass_incorrect">連接wifi失敗,名稱或密碼錯誤</string>
-    <string name="error_login_acc_pass_incorrect">The account or password is incorrect</string>
+    <string name="error_wifi_account_empty">Wifi name cannot be empty.</string>
+    <string name="error_wifi_password_empty">Wifi password cannot be empty.</string>
+    <string name="error_wifi_length">Wifi name and password cannot be less than 20 characters.</string>
+    <string name="error_wifi_special_symbols">Wi-Fi name and password cannot have spaces or special characters.</string>
+    <string name="error_wifi_acc_pass_incorrect">Wi-Fi password or name is incorrect.</string>
 
     <string name="unknown_error_occurred">An unknown error occurred</string>
     <string name="body_temperature">Temperature</string>
@@ -264,7 +260,7 @@
     <string name="device_failure">Equipment failure.</string>
     <string name="drawer_set_up">Set Up</string>
 
-    <string name="exception_notification">Exception Notification</string>
+
     <string name="not_open_wifi">Make sure your WiFi is turned on.</string>
     <string name="no_supports_check_wifi"> The function supports devices running the Android 10 or above.</string>
     <string name="no_open_bluetooth">Make sure Bluetooth is turned on.</string>
@@ -274,5 +270,14 @@
     <string name="calibration_success">Calibrated Success.</string>
     <string name="calibration_failed">Calibration Failed.</string>
 
+    <string name="ask_permission_again_title">Request app permissions</string>
+    <string name="ask_permission_again_message">iCare need certain permissions to run on Android, and we use these permissions to run features in the app. </string>
 
+    <string name="account_hint">Account must be 6&#8208;20 characters consisting of numbers and characters.</string>
+    <string name="password_hint">Password must be 6&#8208;20 characters consisting of numbers and characters.</string>
+    <string name="error_login_acc_pass_incorrect">Your password is incorrect or this account doesn\&#39;t exist</string>
+    <string name="login">Sign in</string>
+    <string name="wifi_setting">Binding a Wi-Fi</string>
+    <string name="exception_notification">Alert Message</string>
+    <string name="response_unauthenticated">The request does not have valid authentication credentials, please login again.</string>
 </resources>

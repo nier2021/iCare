@@ -31,5 +31,11 @@ data class CheckDeviceResponse(
         @SerializedName("accountId")
         val accountId: Int,
 
+        @SerializedName("is_alarm")
+        val isAlarm: Int,
+
+        @SerializedName("temperature_correction")
+        val temperatureCorrection: Float, //35.88
+
     ) : Parcelable
 }

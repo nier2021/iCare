@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.docter.icare.data.bleUtil.bleInterface.BleConnectListener
 import com.docter.icare.data.bleUtil.bleInterface.BleDataReceiveListener
 import com.docter.icare.data.entities.device.ToastAlertEntity
+import com.docter.icare.data.network.api.apiErrorShow
 import com.docter.icare.databinding.FragmentDeviceScanBinding
 import com.docter.icare.ui.base.BaseFragment
 import com.docter.icare.ui.main.MainActivity
@@ -134,7 +135,7 @@ class DeviceScanFragment : BaseFragment() {
         }
 
         override fun onConnectFailed() {
-            Log.i("DeviceScanViewModel", "onConnectFinished 藍芽連結失敗")
+            Log.i("DeviceScanFragment", "onConnectFinished 藍芽連結失敗")
            main { connectProgressDialog.dismiss() }
 //            viewModel.bleDisconnect()
             viewModel.isConnect()
@@ -160,19 +161,33 @@ class DeviceScanFragment : BaseFragment() {
             runCatching {
                 viewModel.deviceBindingRequest(context!!.applicationContext, device, 1)
             }.onSuccess {
-//                Log.i("DeviceScanViewModel","deviceBindingRequest bind_success")
-               val isConnect: Boolean = viewModel.isConnect()
-                if (isConnect) wifiSetData()
-                else{
-                    main { connectProgressDialog.dismiss() }
-                    binding.root.snackbar(R.string.failed_connect_device)
+                if (it.success == 1){
+                    viewModel.saveDeviceInfo(type = 1, device = device)
+                    Log.i("DeviceScanFragment","deviceBindingRequest bind_success")
+                    val isConnect: Boolean = viewModel.isConnect()
+                    if (isConnect) wifiSetData()
+                    else{
+                        main { connectProgressDialog.dismiss() }
+                        binding.root.snackbar(R.string.failed_connect_device)
+                    }
                 }
             }.onFailure {
-                Log.i("DeviceScanViewModel","deviceBindingRequest bind_Failure")
+                Log.i("DeviceScanFragment","deviceBindingRequest bind_Failure")
                 viewModel.bleDisconnect()
                 main { connectProgressDialog.dismiss() }
                 it.printStackTrace()
-                binding.root.snackbar(it)
+                if (it.message.isNullOrBlank()) binding.root.snackbar(requireContext().getString(R.string.unknown_error_occurred))
+                else {
+                    val getMessage: Pair<Boolean, String> = it.message!!.apiErrorShow(requireContext())
+                    Log.i("DeviceScanFragment", "deviceBindingRequest onFailure getMessage first=>${getMessage.first}")
+                    binding.root.snackbar(getMessage.second)
+                    if (getMessage.first){
+                        //logout
+                        activityViewModel.tokenFailLogout.value = true
+                        requireContext().toast(R.string.logout)
+                    }
+
+                }
             }
         }
     }
@@ -217,13 +232,13 @@ class DeviceScanFragment : BaseFragment() {
     }
 
     private fun waitRadar(msg:String){
-        Log.i("DeviceScanViewModel","$msg... waitRadar")
+        Log.i("DeviceScanFragment","$msg... waitRadar")
     }
 
     private fun goNext(){
         //找裝置名稱是否有溫感器 没有温度的编号开头是TMOT04V1，有温度编号的是TMOT04V2
         val isHasTemperature = viewModel.isHasTemperature()
-        Log.i("DeviceScanViewModel","goNext isHasTemperature=>$isHasTemperature")
+        Log.i("DeviceScanFragment","goNext isHasTemperature=>$isHasTemperature")
         if (isHasTemperature) setTemperatureCalibration()
         else{
             main {
@@ -232,7 +247,8 @@ class DeviceScanFragment : BaseFragment() {
                 toastAlertDialog.apply {
                     setMessage(getString(R.string.bind_success))
                     setButton(){
-                        activityViewModel.isChange(true)//webSocket
+//                        activityViewModel.isChange(true)//webSocket
+                        activityViewModel.isDeviceChange.value = true//webSocket
                         requireActivity().onBackPressed()
                     }
                 }.show()
@@ -244,9 +260,9 @@ class DeviceScanFragment : BaseFragment() {
     private val bleSettingReceiveCallback = object : BleDataReceiveListener {
         override fun onRadarData(data: ByteArray) {
             super.onRadarData(data)
-            Log.i("DeviceScanViewModel","onRadarData=>${data.toHexStringSpace()}")
+            Log.i("DeviceScanFragment","onRadarData=>${data.toHexStringSpace()}")
             val receiveString = String(data)
-            Log.i("DeviceScanViewModel","bleSettingReceiveCallback receiveString=>$receiveString")
+            Log.i("DeviceScanFragment","bleSettingReceiveCallback receiveString=>$receiveString")
             main {
                 connectProgressDialog.dismiss()
                 when (receiveString) {
@@ -264,22 +280,32 @@ class DeviceScanFragment : BaseFragment() {
                     "OTHER FAIL" ->binding.root.snackbar(R.string.device_failure)
                 }
 
-                //回傳TMP表示成功之後顯示成功按鈕按下就退回上一頁
                 if (receiveString.contains("TMP")){
                     Log.i(
-                        "DeviceScanViewModel",
+                        "DeviceScanFragment",
                         "bleSettingReceiveCallback ontains(\"TMP\") =>$receiveString"
                     )
 
-                    setProgressDialog.dismiss()
-                    toastAlertDialog.apply {
-                        setMessage(getString(R.string.bind_success))
-                        setButton(){
-                            activityViewModel.isChange(true)//webSocket
-                            requireActivity().onBackPressed()
-                        }
-                    }.show()
+                    temperatureCalibrationSendServer()
                 }
+
+                //回傳TMP表示成功之後顯示成功按鈕按下就退回上一頁
+//                if (receiveString.contains("TMP")){
+//                    Log.i(
+//                        "DeviceScanFragment",
+//                        "bleSettingReceiveCallback ontains(\"TMP\") =>$receiveString"
+//                    )
+//
+//                    setProgressDialog.dismiss()
+//                    toastAlertDialog.apply {
+//                        setMessage(getString(R.string.bind_success))
+//                        setButton(){
+////                            activityViewModel.isChange(true)//webSocket
+//                            activityViewModel.isDeviceChange.postValue(true)//webSocket
+//                            requireActivity().onBackPressed()
+//                        }
+//                    }.show()
+//                }
 
             }
 
@@ -305,6 +331,44 @@ class DeviceScanFragment : BaseFragment() {
             }
         }
     }
+
+
+    private fun temperatureCalibrationSendServer(){
+        lifecycleScope.launch {
+            runCatching {
+                viewModel.temperatureCalibrationSendServer()
+            }.onSuccess {
+                main {
+                    setProgressDialog.dismiss()
+                    toastAlertDialog.apply {
+                        setMessage(getString(R.string.bind_success))
+                        setButton(){
+//                            activityViewModel.isChange(true)//webSocket
+                            activityViewModel.isDeviceChange.postValue(true)//webSocket
+                            requireActivity().onBackPressed()
+                        }
+                    }.show()
+                }
+            }.onFailure {
+                it.printStackTrace()
+                main {
+                    setProgressDialog.dismiss()
+                    if (it.message.isNullOrBlank()) binding.root.snackbar(requireContext().getString(R.string.unknown_error_occurred))
+                    else {
+                        val getMessage: Pair<Boolean, String> = it.message!!.apiErrorShow(requireContext())
+                        Log.i("DeviceScanFragment", "temperatureCalibrationSendServer onFailure getMessage first=>${getMessage.first}")
+                        binding.root.snackbar(getMessage.second)
+                        if (getMessage.first){
+                            //logout
+                            activityViewModel.tokenFailLogout.value = true
+                            requireContext().toast(R.string.logout)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
 
 //    fun setTemperatureCalibration(temperature: String) {

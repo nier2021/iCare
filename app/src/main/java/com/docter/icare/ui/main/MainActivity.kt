@@ -35,6 +35,7 @@ import com.docter.icare.data.entities.view.MainEntity
 import com.docter.icare.data.entities.view.MainEntity.Companion.ACTIVITY_MONITORING
 import com.docter.icare.data.entities.view.MainEntity.Companion.AIR_QUALITY_INDEX
 import com.docter.icare.data.entities.view.MainEntity.Companion.BEDSIDE_MONITOR
+import com.docter.icare.data.network.api.apiErrorShow
 import com.docter.icare.ui.main.expandableList.ExpandableListAdapter
 import com.docter.icare.ui.start.StartActivity
 import com.docter.icare.ui.start.login.LoginFragment
@@ -154,6 +155,10 @@ class MainActivity : BaseActivity() {
         viewModel.isRestConnect.observe(this){
             if (it != -1 ) connectionWebSocket(it)
         }
+
+        viewModel.tokenFailLogout.observe(this){
+            if (it) checkDevice()
+        }
     }
 
     private var bottomNavListener = NavigationBarView.OnItemSelectedListener {
@@ -234,6 +239,7 @@ class MainActivity : BaseActivity() {
     private val expandableListViewOnChildClickListener =
         ExpandableListView.OnChildClickListener { _, _, groupPosition, childPosition, _ ->
             binding.drawerLayout.close()
+            Log.i("MainActivity","expandableListViewOnChildClickListener groupPosition=>$groupPosition \nchildPosition=>$childPosition")
             when{
                 groupPosition == 0 && childPosition == 0 -> {
                     // this@MainActivity.toast("睡眠感知")
@@ -244,7 +250,8 @@ class MainActivity : BaseActivity() {
 //                groupPosition == 0 && childPosition == 2 -> this@MainActivity.toast("姿態感知")//除了姿態感知 睡眠感知與空氣品質裝置都寫在一起
 //                groupPosition == 1 && childPosition == 0 -> this@MainActivity.toast("關於")
 //                groupPosition == 1 && childPosition == 1 -> this@MainActivity.toast("隱私權政策")
-                groupPosition == 1 && childPosition == 2 -> if (!logoutDialog.isShowing()) logoutDialog.show()
+//                groupPosition == 1 && childPosition == 2 -> if (!logoutDialog.isShowing()) logoutDialog.show()
+                groupPosition == 1 && childPosition == 0 -> if (!logoutDialog.isShowing()) logoutDialog.show()//之後依開放改回上式
 //                    this@MainActivity.toast("登出")
                 else -> this@MainActivity.toast("尚未開放")
             }
@@ -263,7 +270,7 @@ class MainActivity : BaseActivity() {
         }.onSuccess {
             if (it != null){
                 bleDisconnect(it)
-            }else logout()
+            }else logoutServer()
         }.onFailure {
             it.printStackTrace()
             this@MainActivity.toast("檢索裝置失敗,登出失敗")
@@ -287,8 +294,9 @@ class MainActivity : BaseActivity() {
             runCatching {
                 viewModel.closeSocket()
             }.onSuccess {
-                unBindDevice(deviceInfoEntity)
+//                unBindDevice(deviceInfoEntity)
                 Log.i("MainActivity","onClose  onSuccess")
+                logoutServer()
             }.onFailure {
                 Log.i("MainActivity","onClose onFailure e=>${it.message}")
                 it.printStackTrace()
@@ -297,22 +305,40 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun unBindDevice(deviceInfoEntity: DeviceInfoEntity){
-        main{progressDialog.show()}
+//    private fun unBindDevice(deviceInfoEntity: DeviceInfoEntity){
+//        main{progressDialog.show()}
+//        lifecycleScope.launch {
+//            runCatching {
+//                viewModel.unBindDevice(deviceInfoEntity)
+//            }.onSuccess {
+//                logoutServer()
+//            }.onFailure {
+//                main{progressDialog.dismiss()}
+//                it.printStackTrace()
+//                binding.root.snackbar(it)
+//            }
+//
+//        }
+//    }
+
+
+    private fun logoutServer(){
         lifecycleScope.launch {
             runCatching {
-                viewModel.unBindDevice(deviceInfoEntity)
+                viewModel.logoutServer()
             }.onSuccess {
                 logout()
             }.onFailure {
-                main{progressDialog.dismiss()}
                 it.printStackTrace()
-                binding.root.snackbar(it)
+                logout()
+                if (it.message.isNullOrBlank()) Log.i("MainActivity", "logoutServer onFailure it.message.isNullOrBlank()")
+                else {
+                    val getMessage: Pair<Boolean, String> = it.message!!.apiErrorShow(this@MainActivity)
+                    Log.i("MainActivity", "logout onFailure getMessage first=>${getMessage.first}")
+                }
             }
-
         }
     }
-
 
 
     private fun logout(){
@@ -341,24 +367,74 @@ class MainActivity : BaseActivity() {
 
     //取得後台登入帳號裝置狀態
     private fun getAccountDeviceInfo(){
-        Log.i("MainActivity","getAccountDeviceInfo")
+//        Log.i("MainActivity","getAccountDeviceInfo")
         lifecycleScope.launch {
             runCatching {
                 viewModel.getAccountDeviceInfo()
             }.onSuccess {
-                Log.i("MainActivity","getAccountDeviceInfo onSuccess getDeviceList=>$it")
-                //is device bind?
-                if (it.isNotEmpty()){
-                    getDeviceAccountId()
-                    viewModel.isHasTemperature()
-                }else viewModel.closeSocket()
+//                Log.i("MainActivity","getAccountDeviceInfo onSuccess getDeviceList=>$it")
+                if (it.success == 1){
+                        viewModel.saveAccountDeviceInfo(it)
+                    if (it.data.isNotEmpty()){
+                        getDeviceAccountId()
+                        viewModel.isHasTemperature()
+                    }else{
+                        viewModel.closeSocket()
+                    }
+                }
             }.onFailure {
-                Log.i("MainActivity","getAccountDeviceInfo onFailure e=>${it.message}")
+//                Log.i("MainActivity","getAccountDeviceInfo onFailure e=>${it.message}")
                 it.printStackTrace()
-                binding.root.snackbar(it)
+                if (it.message.isNullOrBlank()) binding.root.snackbar(this@MainActivity.getString(R.string.unknown_error_occurred))
+                else {
+                    val getMessage: Pair<Boolean, String> = it.message!!.apiErrorShow(this@MainActivity)
+//                    Log.i("MainActivity", "logout onFailure getMessage first=>${getMessage.first}")
+                    binding.root.snackbar(getMessage.second)
+                    if (getMessage.first){
+                        //logout
+                        viewModel.tokenFailLogout.value = true
+                        this@MainActivity.toast(R.string.logout)
+                    }
+                }
             }
         }
     }
+
+//    private fun getAccountDeviceInfo(){
+//        Log.i("MainActivity","getAccountDeviceInfo")
+//        lifecycleScope.launch {
+//            runCatching {
+//                viewModel.getAccountDeviceInfo(this@MainActivity)
+//            }.onSuccess {
+//                Log.i("MainActivity","getAccountDeviceInfo onSuccess getDeviceList=>$it")
+//                //is device bind?
+//                if (it.isNotEmpty()){
+//                    getDeviceAccountId()
+//                    viewModel.isHasTemperature()
+//                }else viewModel.closeSocket()
+//            }.onFailure {
+//                Log.i("MainActivity","getAccountDeviceInfo onFailure e=>${it.message}")
+//                it.printStackTrace()
+//                binding.root.snackbar(it)
+//            }
+//        }
+//    }
+
+    // if (it.success == 1){
+    //                    Log.i("DeviceRepository","getAccountDeviceInfo success data=>${res.data}")
+    //                    if (res.data.isNotEmpty()){
+    //                        //deviceType 0:ra  1:air
+    //                        setDevice(0,res.data.firstOrNull { it.deviceType == 0 })
+    //                        setDevice(1,res.data.firstOrNull { it.deviceType == 1 })
+    //                        //感知器會有多台 無法使用first 假如deviceType是4?
+    //                        val getActivityDeviceList: MutableList<CheckDeviceResponse.DeviceInfo> = mutableListOf()
+    //                        res.data.map { if (it.deviceType == 4) getActivityDeviceList.add(it) }
+    //                        if (getActivityDeviceList.isNotEmpty()) getActivityDeviceList.map { Log.i("DeviceRepository","看如何新增多台紀錄 db?") } else Log.i("DeviceRepository","看如何移除多台紀錄 db?")
+    //                    }else{
+    //                        //表示無裝置
+    //                        Log.i("DeviceRepository","getAccountDeviceInfo 無裝置")
+    //                        allClean()
+    //                    }
 
     //設定右上異常通知顯示
 //    override fun onCreateOptionsMenu(menu: Menu?): Boolean {

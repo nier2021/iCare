@@ -79,7 +79,7 @@ class LinkWebSocketListener(context: Context, accountId: Int) : WebSocketListene
 //                        socketEventChannel.send(SocketUpdate(text = "breath_state=>$${getRadarJsonData.data.status.breath_state}"))
                         try {
                             with(getRadarJsonData.data){
-                                socketEventChannel.send(SocketUpdate(bioRadar = BioRadarEntity(accountId = accountId, time = time, radar_state = status.radar_state, distance = status.distance, heart_rate = status.heart_rate, bed_state = status.bed_state, breath_state = status.breath_state, temperature = status.temperature  )))
+                                socketEventChannel.send(SocketUpdate(bioRadar = BioRadarEntity(accountId = accountId, time = time, distance = status.distance, heart_rate = status.heart_rate, bed_state = status.bed_state, breath_state = status.breath_state, temperature = status.temperature  )))
                             }
                         }catch (e:Exception){
                             Log.i("LinkWebSocketListener","onMessage Exception=>${e.message}")

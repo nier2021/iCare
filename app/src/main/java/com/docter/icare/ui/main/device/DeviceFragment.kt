@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.docter.icare.R
 import com.docter.icare.data.entities.device.ToastAlertEntity
+import com.docter.icare.data.network.api.apiErrorShow
 import com.docter.icare.databinding.FragmentDeviceBinding
 import com.docter.icare.ui.base.BaseFragment
 import com.docter.icare.ui.main.MainViewModel
@@ -104,6 +105,10 @@ class DeviceFragment : BaseFragment() {
 
             isSetProgress.observe(viewLifecycleOwner){
                 if (it) setProgressDialog.show() else setProgressDialog.dismiss()
+            }
+
+            isLogout.observe(viewLifecycleOwner){
+                if (it) logout()
             }
         }
 
@@ -203,7 +208,7 @@ class DeviceFragment : BaseFragment() {
         override fun onConfirmClick(temperature: String) {
             Log.i("DeviceFragment","temperatureSetDialogClickListener onConfirmClick temperature=>$temperature")
             if (temperature.isNotBlank() && temperature.toFloat() in 35f..42f){
-                main {
+                main {Double
                     viewModel.setTemperatureCalibration(temperature)
                 }
             }
@@ -239,21 +244,25 @@ class DeviceFragment : BaseFragment() {
                 viewModel.unBindDevice(requireContext())
             }.onSuccess {
                 main{ connectProgressDialog.dismiss() }
-                Log.i("DeviceFragment","解綁成功")
+                if (it.success == 1){
+                    viewModel.saveDeviceInfo()
+                    Log.i("DeviceFragment","解綁成功")
 //                requireContext().toast(requireContext().getString(R.string.unbind_success))
-                binding.root.snackbar(getString(R.string.unbind_success))
-                viewModel.getDeviceInfo()
-                viewModel.bleDisconnect()
-                with(binding){
-                    layoutBtnDeviceBind.title.text = getString(R.string.device_setting)
-                    layoutBtnDeviceBind.icon.setImageResource(R.drawable.icon_device_bind)
-                    tvDeviceName.text = ""
-                    layoutDeviceName.visibility = View.GONE
+                    binding.root.snackbar(getString(R.string.unbind_success))
+                    viewModel.getDeviceInfo()
+                    viewModel.bleDisconnect()
+                    with(binding){
+                        layoutBtnDeviceBind.title.text = getString(R.string.device_setting)
+                        layoutBtnDeviceBind.icon.setImageResource(R.drawable.icon_device_bind)
+                        tvDeviceName.text = ""
+                        layoutDeviceName.visibility = View.GONE
 //                    layoutBtnBedType.root.background = ContextCompat.getDrawable(requireContext(),R.drawable.background_button_grey)
 //                    layoutBtnBedType.root.isClickable = false
-                    layoutBtnTemperatureCalibration.root.background = ContextCompat.getDrawable(requireContext(),R.drawable.background_button_grey)
-                    layoutBtnTemperatureCalibration.root.isClickable = false
-                    activityViewModel.isChange(true)//webSocket
+                        layoutBtnTemperatureCalibration.root.background = ContextCompat.getDrawable(requireContext(),R.drawable.background_button_grey)
+                        layoutBtnTemperatureCalibration.root.isClickable = false
+//                        activityViewModel.isChange(true)//webSocket
+                        activityViewModel.isDeviceChange.postValue(true)//webSocket
+                    }
                 }
             }.onFailure {
                 main{ connectProgressDialog.dismiss() }
@@ -261,7 +270,19 @@ class DeviceFragment : BaseFragment() {
                 Log.i("DeviceFragment","解綁失敗")
 //                requireContext().toast(requireContext().getString(R.string.unbind_failed))
                 it.printStackTrace()
-                binding.root.snackbar(it)
+                if (it.message.isNullOrBlank()) binding.root.snackbar(requireContext().getString(R.string.unknown_error_occurred))
+                else {
+                    val getMessage: Pair<Boolean, String> = it.message!!.apiErrorShow(requireContext())
+                    Log.i("DeviceFragment", "deviceBindingRequest onFailure getMessage first=>${getMessage.first}")
+                    binding.root.snackbar(getMessage.second)
+                    if (getMessage.first){
+                        logout()
+                        //logout
+//                        activityViewModel.tokenFailLogout.value = true
+//                        requireContext().toast(R.string.logout)
+                    }
+
+                }
             }
         }
     }
@@ -337,6 +358,13 @@ class DeviceFragment : BaseFragment() {
             }
         }
 
+    }
+
+    private fun logout(){
+        main {
+            activityViewModel.tokenFailLogout.value = true
+            requireContext().toast(R.string.logout)
+        }
     }
 
 

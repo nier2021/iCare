@@ -1,5 +1,6 @@
 package com.docter.icare.data.repositories
 
+import android.content.Context
 import android.util.Log
 import com.docter.icare.R
 import com.docter.icare.data.bleUtil.device.air.AirBleDataManager
@@ -8,10 +9,13 @@ import com.docter.icare.data.entities.device.DeviceInfoEntity
 import com.docter.icare.data.entities.view.ExpandableListEntity
 import com.docter.icare.data.network.SafeApiRequest
 import com.docter.icare.data.network.api.ApiService
+import com.docter.icare.data.network.api.apiErrorShow
 import com.docter.icare.data.network.api.response.CheckDeviceResponse
 import com.docter.icare.data.preferences.PreferenceProvider
 import com.docter.icare.data.resource.*
 import com.docter.icare.utils.SidException
+import com.docter.icare.utils.isHasTemperature
+import com.docter.icare.utils.snackbar
 
 class MainRepository(
     private val resource: ResourceProvider,
@@ -48,7 +52,6 @@ class MainRepository(
         DeviceInfoEntity(
             radarDeviceName = preference.getString(RADAR_DEVICE_NAME,""),
             radarDeviceMac =  preference.getString(RADAR_DEVICE_MAC,""),
-            bedType = preference.getInt(BED_TYPE,-1),
             airDeviceName = preference.getString(AIR_DEVICE_NAME,""),
             airDeviceMac = preference.getString(AIR_DEVICE_MAC,""),
             wifiAccount = preference.getString(WIFI_NAME),
@@ -59,47 +62,47 @@ class MainRepository(
     fun isConnect(deviceType: String) = if (deviceType == "Radar" ) radarBleDataManager.isConnect else airBleDataManager.isConnect
     fun radarBleDisconnect(deviceType: String) = if (deviceType == "Radar" )radarBleDataManager.disconnect() else airBleDataManager.disconnect()
 
-    suspend fun deviceUnBindingRequest( deviceType: String, deviceInfoEntity: DeviceInfoEntity) =
-        apiRequest{
-            Log.i("MainRepository","deviceBindingRequest SID=>${preference.getString(SID)}")
-            api.bindingRadarDevice(
-                sid = preference.getString(SID),
-                type = 0,
-                serialNumber = if (deviceType == "Radar") {
-                    Log.i("MainRepository","deviceUnBindingRequest unDevice Radar DeviceName=>${deviceInfoEntity.radarDeviceName}")
-                    deviceInfoEntity.radarDeviceName
-                }else{
-                    deviceInfoEntity.airDeviceName
-                },
-                macAddress =  if (deviceType == "Radar") {
-                    Log.i("MainRepository","deviceUnBindingRequest unDevice Radar DeviceMac=>${deviceInfoEntity.radarDeviceMac}")
-                    deviceInfoEntity.radarDeviceMac
-                }else{
-                    deviceInfoEntity.airDeviceMac
-                },
-
-               deviceType =  if (deviceType == "Radar") {
-                    Log.i("DeviceRepository","deviceBindingRequest device Radar")
-                    0
-                } else {
-                    Log.i("DeviceRepository","deviceBindingRequest device Air")
-                    1
-                }
-            )
-        }.let {
-            if (it.success == 1){
-                Log.i("DeviceRepository","deviceBindingRequest bind success type==0")
-                saveDevice(deviceType)
-            }else{
-                if (deviceType == "Radar") {
-                    Log.i("DeviceRepository","deviceBindingRequest device Radar")
-                    throw  SidException(resource.getString(R.string.unbind_failed)+ "=>" +resource.getString(R.string.bioradar))
-                } else {
-                    Log.i("DeviceRepository","deviceBindingRequest device Air")
-                    throw  SidException(resource.getString(R.string.unbind_failed)+ "=>" +resource.getString(R.string.air_box))
-                }
-            }
-        }
+//    suspend fun deviceUnBindingRequest( deviceType: String, deviceInfoEntity: DeviceInfoEntity) =
+//        apiRequest{
+//            Log.i("MainRepository","deviceBindingRequest SID=>${preference.getString(SID)}")
+//            api.bindingDevice(
+//                sid = preference.getString(SID),
+//                type = 0,
+//                serialNumber = if (deviceType == "Radar") {
+//                    Log.i("MainRepository","deviceUnBindingRequest unDevice Radar DeviceName=>${deviceInfoEntity.radarDeviceName}")
+//                    deviceInfoEntity.radarDeviceName
+//                }else{
+//                    deviceInfoEntity.airDeviceName
+//                },
+//                macAddress =  if (deviceType == "Radar") {
+//                    Log.i("MainRepository","deviceUnBindingRequest unDevice Radar DeviceMac=>${deviceInfoEntity.radarDeviceMac}")
+//                    deviceInfoEntity.radarDeviceMac
+//                }else{
+//                    deviceInfoEntity.airDeviceMac
+//                },
+//
+//               deviceType =  if (deviceType == "Radar") {
+//                    Log.i("DeviceRepository","deviceBindingRequest device Radar")
+//                    0
+//                } else {
+//                    Log.i("DeviceRepository","deviceBindingRequest device Air")
+//                    1
+//                }
+//            )
+//        }.let {
+//            if (it.success == 1){
+//                Log.i("DeviceRepository","deviceBindingRequest bind success type==0")
+//                saveDevice(deviceType)
+//            }else{
+//                if (deviceType == "Radar") {
+//                    Log.i("DeviceRepository","deviceBindingRequest device Radar")
+//                    throw  SidException(resource.getString(R.string.unbind_failed)+ "=>" +resource.getString(R.string.bioradar))
+//                } else {
+//                    Log.i("DeviceRepository","deviceBindingRequest device Air")
+//                    throw  SidException(resource.getString(R.string.unbind_failed)+ "=>" +resource.getString(R.string.air_box))
+//                }
+//            }
+//        }
 
     private fun saveDevice(deviceType: String){
         if (deviceType == "Radar") {
@@ -107,15 +110,12 @@ class MainRepository(
             with(preference){
                 set(RADAR_DEVICE_MAC, "")
                 set(RADAR_DEVICE_NAME, "")
-                set(RADAR_DEVICE_ACCOUNT_ID,"")
-                set(BED_TYPE,-1)
             }
         } else {
             Log.i("DeviceRepository","saveDevice air")
             with(preference){
                 set(AIR_DEVICE_MAC,"")
                 set(AIR_DEVICE_NAME, "")
-                set(AIR_DEVICE_ACCOUNT_ID,"")
             }
         }
         preference.set(WIFI_NAME,"")
@@ -127,37 +127,57 @@ class MainRepository(
         with(preference){
             set(ACCOUNT, "")
             set(PASSWORD, "")
-            set(SID, "")
+            set(ACCOUNT_ID,"")
+            set(TOKEN, "")
             set(NAME, "")
         }
     }
 
 
-    suspend fun getAccountDeviceInfo():MutableList<CheckDeviceResponse.DeviceInfo> = apiRequest{
-        Log.i("DeviceRepository","getAccountDeviceInfo")
-        api.checkDevice(preference.getString(SID))
-//        api.checkDevice("hueuan4")
-    }.let { res ->
-        if (res.success == 1){
-            Log.i("DeviceRepository","getAccountDeviceInfo success data=>${res.data}")
-            if (res.data.isNotEmpty()){
-                //deviceType 0:ra  1:air
-                setDevice(0,res.data.firstOrNull { it.deviceType == 0 })
-                setDevice(1,res.data.firstOrNull { it.deviceType == 1 })
-                //感知器會有多台 無法使用first 假如deviceType是4?
-                val getActivityDeviceList: MutableList<CheckDeviceResponse.DeviceInfo> = mutableListOf()
-                res.data.map { if (it.deviceType == 4) getActivityDeviceList.add(it) }
-                if (getActivityDeviceList.isNotEmpty()) getActivityDeviceList.map { Log.i("DeviceRepository","看如何新增多台紀錄 db?") } else Log.i("DeviceRepository","看如何移除多台紀錄 db?")
-            }else{
-                //表示無裝置
-                Log.i("DeviceRepository","getAccountDeviceInfo 無裝置")
-                allClean()
-            }
+//    suspend fun getAccountDeviceInfo(context: Context):MutableList<CheckDeviceResponse.DeviceInfo> = apiRequest{
+//        Log.i("DeviceRepository","getAccountDeviceInfo")
+//        api.checkDevice(preference.getString(TOKEN,""))
+//    }.let { res ->
+//        if (res.success == 1){
+//            Log.i("DeviceRepository","getAccountDeviceInfo success data=>${res.data}")
+//            if (res.data.isNotEmpty()){
+//                //deviceType 0:ra  1:air
+//                setDevice(0,res.data.firstOrNull { it.deviceType == 0 })
+//                setDevice(1,res.data.firstOrNull { it.deviceType == 1 })
+//                //感知器會有多台 無法使用first 假如deviceType是4?
+//                val getActivityDeviceList: MutableList<CheckDeviceResponse.DeviceInfo> = mutableListOf()
+//                res.data.map { if (it.deviceType == 4) getActivityDeviceList.add(it) }
+//                if (getActivityDeviceList.isNotEmpty()) getActivityDeviceList.map { Log.i("DeviceRepository","看如何新增多台紀錄 db?") } else Log.i("DeviceRepository","看如何移除多台紀錄 db?")
+//            }else{
+//                //表示無裝置
+//                Log.i("DeviceRepository","getAccountDeviceInfo 無裝置")
+//                allClean()
+//            }
+//
+////            if (getDeviceInfoList.isNotEmpty()) Log.i("getAccountDeviceInfo","getDeviceInfoList[0] serialNumber=>${getDeviceInfoList[0].serialNumber}\n deviceType=>${getDeviceInfoList[0].deviceType}")
+//            return res.data.toMutableList()
+//        } else throw if (res.message.isBlank()) SidException(resource.getString(R.string.unknown_error_occurred)) else SidException(res.message.apiErrorShow(context).second)
+//
+////            throw SidException(res.message)
+//
+//    }
 
-//            if (getDeviceInfoList.isNotEmpty()) Log.i("getAccountDeviceInfo","getDeviceInfoList[0] serialNumber=>${getDeviceInfoList[0].serialNumber}\n deviceType=>${getDeviceInfoList[0].deviceType}")
-            return res.data.toMutableList()
-        }else throw SidException(res.message)
+    suspend fun getAccountDeviceInfo() = apiRequest{ api.checkDevice(preference.getString(TOKEN,"")) }
 
+    fun saveAccountDeviceInfo(data: CheckDeviceResponse){
+        if (data.data.isNotEmpty()){
+            //deviceType 0:ra  1:air
+            setDevice(0,data.data.firstOrNull { it.deviceType == 0 })
+            setDevice(1,data.data.firstOrNull { it.deviceType == 1 })
+            //感知器會有多台 無法使用first 假如deviceType是4?
+            val getActivityDeviceList: MutableList<CheckDeviceResponse.DeviceInfo> = mutableListOf()
+            data.data.map { if (it.deviceType == 4) getActivityDeviceList.add(it) }
+            if (getActivityDeviceList.isNotEmpty()) getActivityDeviceList.map { Log.i("DeviceRepository","看如何新增多台紀錄 db?") } else Log.i("DeviceRepository","看如何移除多台紀錄 db?")
+        }else{
+            //表示無裝置
+            Log.i("DeviceRepository","getAccountDeviceInfo 無裝置")
+            allClean()
+        }
     }
 
     private fun setDevice(deviceType: Int, device: CheckDeviceResponse.DeviceInfo? ){
@@ -170,16 +190,14 @@ class MainRepository(
                     with(preference){
                         set(RADAR_DEVICE_NAME, device.serialNumber)
                         set(RADAR_DEVICE_MAC, device.macAddress)
-                        set(RADAR_DEVICE_ACCOUNT_ID,device.accountId)
-                        if (getInt(BED_TYPE,-1) == -1) set(BED_TYPE,1)
                     }
+                    if(device.serialNumber.isHasTemperature()) preference.set(RADAR_TEMPERATURE,device.temperatureCorrection.toString())
                 }else{
                     Log.i("DeviceRepository","remove radar")
                     with(preference){
                         set(RADAR_DEVICE_MAC, "")
                         set(RADAR_DEVICE_NAME, "")
-                        set(RADAR_DEVICE_ACCOUNT_ID,"")
-                        set(BED_TYPE,-1)
+                        set(RADAR_TEMPERATURE,"")
                     }
                 }
             }
@@ -189,14 +207,12 @@ class MainRepository(
                     with(preference){
                         set(AIR_DEVICE_NAME, device.serialNumber)
                         set(AIR_DEVICE_MAC, device.macAddress)
-                        set(AIR_DEVICE_ACCOUNT_ID, device.accountId)
                     }
                 }else{
                     Log.i("DeviceRepository","remove air")
                     with(preference){
                         set(AIR_DEVICE_NAME, "")
                         set(AIR_DEVICE_MAC,"")
-                        set(AIR_DEVICE_ACCOUNT_ID,"")
                     }
                 }
             }
@@ -210,13 +226,12 @@ class MainRepository(
             //雷達波
             set(RADAR_DEVICE_MAC, "")
             set(RADAR_DEVICE_NAME, "")
-            set(RADAR_DEVICE_ACCOUNT_ID,"")
-            set(BED_TYPE,-1)
             //空氣盒子
             set(AIR_DEVICE_MAC,"")
             set(AIR_DEVICE_NAME, "")
-            set(AIR_DEVICE_ACCOUNT_ID,"")
         }
         //未做多台感知器移除方法
     }
+
+    suspend fun logoutServer() =  apiRequest { api.logout(preference.getString(TOKEN,""))}
 }

@@ -65,7 +65,7 @@ data class RadarInfoData1(
 )
 
 data class RadarInfoStatus2(
-    val radar_state: String,
+//    val radar_state: String,
     val distance: String,
     val heart_rate: String,
     val bed_state: String,

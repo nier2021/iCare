@@ -87,6 +87,7 @@
                     android:background="@drawable/background_input_box_primary_stroke_blue"
                     android:gravity="center"
                     android:hint="@string/wifi_password"
+                    android:imeOptions="actionDone"
                     android:inputType="text"
                     android:digits="0123456789abcdefghigklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                     android:maxLines="1"

@@ -116,7 +116,7 @@
                 android:background="@drawable/background_input_box_primary_stroke"
                 android:gravity="center"
                 android:hint="@string/password_hint"
-                android:imeOptions="actionNext"
+                android:imeOptions="actionDone"
                 android:inputType="text"
                 android:lines="1"
                 android:padding="16dp"

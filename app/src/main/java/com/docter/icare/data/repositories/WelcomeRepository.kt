@@ -12,7 +12,7 @@ import com.docter.icare.data.preferences.PreferenceProvider
 import com.docter.icare.data.resource.ACCOUNT_ID
 import com.docter.icare.data.resource.NAME
 import com.docter.icare.data.resource.ResourceProvider
-import com.docter.icare.data.resource.SID
+import com.docter.icare.data.resource.*
 import com.docter.icare.utils.PermissionCheckUtils
 
 class WelcomeRepository (
@@ -104,6 +104,8 @@ class WelcomeRepository (
         else -> grantResults.any { it != PackageManager.PERMISSION_GRANTED }
     }
 
-    fun isLoggedIn() = preference.getString(SID).isNotBlank()
+//    fun isLoggedIn() = preference.getString(SID).isNotBlank()
+
+    fun isLoggedIn() = preference.getString(TOKEN).isNotBlank()
 
 }

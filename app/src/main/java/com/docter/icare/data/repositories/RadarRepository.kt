@@ -16,7 +16,9 @@ class RadarRepository (
     private val preference: PreferenceProvider,
 ) : SafeApiRequest(resource) {
 
-    fun getDeviceAccountId() = preference.getInt(RADAR_DEVICE_ACCOUNT_ID,-1)
+    fun getDeviceAccountId() = preference.getInt(ACCOUNT_ID,-1)
+
+    fun getDeviceBind() = preference.getBoolean(IS_DEVICE_BIND,false)
 
     //找裝置名稱是否有溫感器 没有温度的编号开头是TMOT04V1，有温度编号的是TMOT04V2
     fun isHasTemperature() : Boolean{

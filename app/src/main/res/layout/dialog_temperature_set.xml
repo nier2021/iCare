@@ -61,6 +61,7 @@
                     android:gravity="center"
                     android:hint="@string/temperature_calibration_hit"
                     android:inputType="numberDecimal"
+                    android:imeOptions="actionDone"
                     android:digits="0123456789."
                     android:maxLength="5"
                     android:maxLines="1"

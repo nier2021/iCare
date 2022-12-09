@@ -19,7 +19,8 @@ import kotlinx.coroutines.launch
 import org.kodein.di.android.x.closestDI
 import org.kodein.di.instance
 import androidx.core.app.ActivityOptionsCompat.makeSceneTransitionAnimation
-import com.docter.icare.data.network.api.response.LoginResponse2
+import com.docter.icare.data.network.api.apiErrorShow
+import com.docter.icare.data.network.api.response.LoginResponse
 import com.docter.icare.utils.Coroutines.main
 import com.docter.icare.utils.clearStack
 
@@ -32,6 +33,7 @@ class LoginFragment : BaseFragment() {
     private val viewModel: LoginViewModel by lazy { ViewModelProvider(this, factory)[LoginViewModel::class.java] }
 
     private val progressDialog: CustomProgressDialog by lazy { CustomProgressDialog(requireActivity(), R.string.signing) }
+    private val appContext by lazy { requireContext().applicationContext }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,7 +52,8 @@ class LoginFragment : BaseFragment() {
         super.onClick(view)
         when(view){
             binding.btnLogin -> checkInput()
-            binding.tvRegister -> register()
+            binding.tvRegister -> appContext.toast(R.string.no_function)
+//                register()
         }
     }
 
@@ -73,20 +76,21 @@ class LoginFragment : BaseFragment() {
             runCatching {
                 viewModel.login()
             }.onSuccess {
-                if (it.sid.isNotBlank()) { save(it) } else binding.root.snackbar("Server error")
+                if ( it.success == 1 && it.token.isNotBlank() && it.user.account.isNotBlank()) { save(it) } else binding.root.snackbar("Server error")
             }.onFailure {
                 main { progressDialog.dismiss() }
                 it.printStackTrace()
-                binding.root.snackbar(it)
+//                binding.root.snackbar(it)
+                if (it.message.isNullOrBlank()) binding.root.snackbar(appContext.getString(R.string.unknown_error_occurred)) else binding.root.snackbar(it.message!!.apiErrorShow(appContext).second)
             }
         }
     }
 
-    private fun save(data: LoginResponse2){
+    private fun save(data: LoginResponse){
         runCatching {
             viewModel.save(data)
         }.onSuccess {
-            requireContext().toast(getString(R.string.login_success))
+            appContext.toast(getString(R.string.login_success))
             main {
                 progressDialog.dismiss()
                 val intent = Intent()

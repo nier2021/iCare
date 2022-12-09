@@ -13,6 +13,7 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.docter.icare.R
+import com.docter.icare.data.network.api.apiErrorShow
 import com.docter.icare.databinding.FragmentBedsideMonitorBinding
 import com.docter.icare.ui.base.BaseFragment
 import com.docter.icare.ui.main.MainViewModel
@@ -58,8 +59,12 @@ class BedsideMonitorFragment : BaseFragment() {
         }
 
 
+
         //webSocket
         with(activityViewModel){
+            //畫面初始化判定是否有裝置
+            getDeviceBind().let { isBind-> if (isBind)  viewModel.bindDeviceShow(requireContext()) else  viewModel.closeSocket(requireContext())}
+
             //後端傳送4狀態正躺 側躺 坐在床邊 離床
             //狀態顏色&&圖片 在床&&側躺＆＆ 藍色 圖相同 值：狀態顯示文字不同 ; 離床&&無人：顏色＝>灰色 圖不同 無值--(直接顯示不管是否有收到呼吸等值);
             getSocketData.observe(viewLifecycleOwner) {
@@ -91,19 +96,22 @@ class BedsideMonitorFragment : BaseFragment() {
             }
 
             isDeviceChange.observe(viewLifecycleOwner){
-                if (it) activityViewModel.getDeviceAccountId().let { id->
-                    if (id != -1) {
-                        viewModel.bindDeviceShow(requireContext())
-                    }else{
-                        viewModel.closeSocket(requireContext())
-                    }
+//                if (it) activityViewModel.getDeviceAccountId().let { id->
+//                    if (id != -1) {
+//                        viewModel.bindDeviceShow(requireContext())
+//                    }else{
+//                        viewModel.closeSocket(requireContext())
+//                    }
+//                }
+                if (it) getDeviceBind().let { isBind->
+                    if (isBind)  viewModel.bindDeviceShow(requireContext()) else  viewModel.closeSocket(requireContext())
                 }
             }
 
+            toolbarClickListener = this@BedsideMonitorFragment.toolbarClickListener
         }
 
         setHasOptionsMenu(true)//設置右上角(Fragment)
-        activityViewModel.toolbarClickListener = toolbarClickListener
 
         return binding.root
     }
@@ -175,18 +183,55 @@ class BedsideMonitorFragment : BaseFragment() {
             }.onSuccess {
                 Log.i("BedsideMonitorFragment","getAccountDeviceInfo onSuccess getDeviceList=>$it")
                 //is device bind?
-                if (it.isNotEmpty()) getDeviceAccountId() else {
-                    main { connectProgressDialog.dismiss()  }
-                    onClose()
+                if (it.success == 1){
+                    activityViewModel.saveAccountDeviceInfo(it)
+                    if (it.data.isNotEmpty()){
+                        getDeviceAccountId()
+                    }else{
+                        main { connectProgressDialog.dismiss()  }
+                        onClose()
+                    }
                 }
             }.onFailure {
                 Log.i("BedsideMonitorFragment","getAccountDeviceInfo onFailure e=>${it.message}")
                 main {  connectProgressDialog.dismiss() }
                 it.printStackTrace()
-                binding.root.snackbar(it)
+                if (it.message.isNullOrBlank()) binding.root.snackbar(requireContext().getString(R.string.unknown_error_occurred))
+                else {
+                    val getMessage: Pair<Boolean, String> = it.message!!.apiErrorShow(requireContext())
+                    Log.i("MainActivity", "logout onFailure getMessage first=>${getMessage.first}")
+                    binding.root.snackbar(getMessage.second)
+                    if (getMessage.first){
+                        //logout
+                        activityViewModel.tokenFailLogout.value = true
+                        requireContext().toast(R.string.logout)
+                    }
+
+                }
             }
         }
     }
+
+//    private fun getAccountDeviceInfo(){
+//        main {  connectProgressDialog.show() }
+//        lifecycleScope.launch {
+//            runCatching {
+//                activityViewModel.getAccountDeviceInfo(requireContext())
+//            }.onSuccess {
+//                Log.i("BedsideMonitorFragment","getAccountDeviceInfo onSuccess getDeviceList=>$it")
+//                //is device bind?
+//                if (it.isNotEmpty()) getDeviceAccountId() else {
+//                    main { connectProgressDialog.dismiss()  }
+//                    onClose()
+//                }
+//            }.onFailure {
+//                Log.i("BedsideMonitorFragment","getAccountDeviceInfo onFailure e=>${it.message}")
+//                main {  connectProgressDialog.dismiss() }
+//                it.printStackTrace()
+//                binding.root.snackbar(it)
+//            }
+//        }
+//    }
 
     private fun getDeviceAccountId(){
         activityViewModel.getDeviceAccountId().let {

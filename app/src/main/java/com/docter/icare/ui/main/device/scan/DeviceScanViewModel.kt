@@ -19,6 +19,8 @@ import com.docter.icare.utils.toHexStringSpace
 import com.xwray.groupie.GroupieAdapter
 import java.util.concurrent.TimeUnit
 import io.reactivex.rxjava3.core.Observable.timer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class DeviceScanViewModel(
     private val deviceRepository: DeviceRepository,
@@ -89,7 +91,7 @@ class DeviceScanViewModel(
 
     fun wifiSetData() = deviceRepository.wifiSetData(deviceType.value!!,accountInfo)
 
-    fun setAppendDistance() =  deviceRepository.setAppendDistance(1)
+//    fun setAppendDistance() =  deviceRepository.setAppendDistance(1)
 
     fun setSettingReceiveCallback(bleSettingReceiveCallback: BleDataReceiveListener)=  deviceRepository.setSettingReceiveCallback(bleSettingReceiveCallback)
 
@@ -101,8 +103,10 @@ class DeviceScanViewModel(
 
     fun cleanTemperature() = radarRepository.cleanTemperature()
 
+    fun saveDeviceInfo(type: Int, device: BluetoothDevice?)= deviceRepository.saveDeviceInfo(type = type, deviceType = deviceType.value!!, device = device)
 
-
-
+    suspend fun temperatureCalibrationSendServer() = withContext(Dispatchers.IO){ deviceRepository.temperatureCalibrationSendServer(
+        temperature = 35f
+    ) }
 
 }

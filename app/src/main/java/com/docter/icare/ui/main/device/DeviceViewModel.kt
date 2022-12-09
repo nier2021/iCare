@@ -11,14 +11,11 @@ import com.docter.icare.R
 import com.docter.icare.data.bleUtil.bleInterface.BleConnectListener
 import com.docter.icare.data.bleUtil.bleInterface.BleDataReceiveListener
 import com.docter.icare.data.entities.device.ToastAlertEntity
-import com.docter.icare.data.entities.view.AccountInfo
 import com.docter.icare.data.entities.view.DeviceEntity
 import com.docter.icare.data.entities.view.LoginEntity
+import com.docter.icare.data.network.api.apiErrorShow
 import com.docter.icare.data.repositories.DeviceRepository
 import com.docter.icare.data.repositories.RadarRepository
-import com.docter.icare.data.resource.RADAR_DEVICE_ACCOUNT_ID
-import com.docter.icare.data.resource.RADAR_DEVICE_MAC
-import com.docter.icare.data.resource.RADAR_DEVICE_NAME
 import com.docter.icare.utils.Coroutines.main
 import com.docter.icare.utils.toBedName
 import com.docter.icare.utils.toHexStringSpace
@@ -82,6 +79,7 @@ class DeviceViewModel(
     //type:1->綁定, 0-> 解綁 ; deviceType:0->生物雷達, 1-> 空氣盒子
     suspend fun unBindDevice(context: Context) = withContext(Dispatchers.IO) { deviceRepository.deviceBindingRequest(context,null,0,entity.deviceType)}
 
+    fun saveDeviceInfo()= deviceRepository.saveDeviceInfo(type = 0, deviceType = entity.deviceType, device = null)
 
     private fun bleConnect(mac: String, bleConnectListener: BleConnectListener)  {
         with(deviceRepository){
@@ -165,12 +163,12 @@ class DeviceViewModel(
 //    }
 
     fun setTemperatureCalibration(temperature: String) {
-        deviceRepository.setTemperatureCalibration(temperature)
         main { isSetProgress.value = true }
         runCatching {
             deviceRepository.setTemperatureCalibration(temperature)
         }.onSuccess {
             waitDevice("setTemperatureCalibration")
+            getTemperature.postValue(temperature)
 //            isSetProgress.postValue(false)
 //            throwMessage.value = ToastAlertEntity(message = appContext.value!!.getString(R.string.calibration_success))
 //            getDeviceInfo()
@@ -201,10 +199,14 @@ class DeviceViewModel(
                     "OTHER FAIL" -> throwMessage.value = ToastAlertEntity(isToastAlert = true, message = appContext.value!!.getString(R.string.device_failure))
                 }
                 //回傳TMP表示成功
+//                if (receiveString.contains("TMP")) {
+//                    Log.i("DeviceViewModel","bleSettingReceiveCallback ontains(\"TMP\") =>$receiveString")
+//                    throwMessage.value = ToastAlertEntity(message = appContext.value!!.getString(R.string.calibration_success))
+//                    getDeviceInfo()
+//                }
                 if (receiveString.contains("TMP")) {
                     Log.i("DeviceViewModel","bleSettingReceiveCallback ontains(\"TMP\") =>$receiveString")
-                    throwMessage.value = ToastAlertEntity(message = appContext.value!!.getString(R.string.calibration_success))
-                    getDeviceInfo()
+                    if (getTemperature.value?.isNotBlank() == true)temperatureCalibrationSendServer()
                 }
             }
 
@@ -212,6 +214,38 @@ class DeviceViewModel(
             ////成功连接 WiFi 并登陆上后台 //WiFi 连接失败
             ////对服务端连接失败 //登陆后台失败
             ////其他失败情况
+        }
+    }
+
+    val getTemperature: MutableLiveData<String> = MutableLiveData("")
+    val isLogout = MutableLiveData(false)
+    suspend fun temperatureCalibrationSendServer() = withContext(Dispatchers.IO){
+        main { isSetProgress.value = true }
+        runCatching {
+            deviceRepository.temperatureCalibrationSendServer(
+                temperature = getTemperature.value!!.toFloat()
+            )
+        }.onSuccess {
+            main {
+                isSetProgress.value = false
+                throwMessage.value = ToastAlertEntity(message = appContext.value!!.getString(R.string.calibration_success))
+                getDeviceInfo()
+            }
+        }.onFailure {
+            main {
+                isSetProgress.value = false
+                if (it.message.isNullOrBlank())  throwMessage.value = ToastAlertEntity(message = appContext.value!!.getString(R.string.unknown_error_occurred))
+                else {
+                    val getMessage: Pair<Boolean, String> = it.message!!.apiErrorShow(appContext.value!!)
+                    Log.i("MainViewModel", "getUserList onFailure getMessage first=>${getMessage.first}")
+                    throwMessage.value =  ToastAlertEntity(message = getMessage.second)
+                    if (getMessage.first){
+                        Log.i("MainViewModel", "getUserList onFailure getMessage first true")
+                        //logout
+                        isLogout.value = true
+                    }
+                }
+            }
         }
     }
 

@@ -10,6 +10,7 @@ import com.docter.icare.R
 import com.docter.icare.data.entities.device.DeviceInfoEntity
 import com.docter.icare.data.entities.view.MainEntity
 import com.docter.icare.data.entities.webSocket.SocketUpdate
+import com.docter.icare.data.network.api.response.CheckDeviceResponse
 import com.docter.icare.data.network.api.webSocket.WebServices
 import com.docter.icare.data.repositories.DeviceRepository
 import com.docter.icare.data.repositories.MainRepository
@@ -118,6 +119,7 @@ class MainViewModel(
 //    }
 
     //取得後台登入帳號裝置狀態
+//    suspend fun getAccountDeviceInfo(context: Context) = withContext(Dispatchers.IO) {mainRepository.getAccountDeviceInfo(context)}
     suspend fun getAccountDeviceInfo() = withContext(Dispatchers.IO) {mainRepository.getAccountDeviceInfo()}
 
     //以下登出
@@ -137,17 +139,18 @@ class MainViewModel(
         if (deviceInfoEntity.isAirBind)  mainRepository.isConnect("Air").let { if (it) mainRepository.radarBleDisconnect("Air") }
     }
 
-    suspend fun unBindDevice(deviceInfoEntity: DeviceInfoEntity) = withContext(Dispatchers.IO) {
-        if (deviceInfoEntity.isRadarBind) {
-            mainRepository.deviceUnBindingRequest("Radar" ,deviceInfoEntity)
-        }
-        if (deviceInfoEntity.isAirBind) {
-            mainRepository.deviceUnBindingRequest( "Air" ,deviceInfoEntity)
-        }
-    }
+//    suspend fun unBindDevice(deviceInfoEntity: DeviceInfoEntity) = withContext(Dispatchers.IO) {
+//        if (deviceInfoEntity.isRadarBind) {
+//            mainRepository.deviceUnBindingRequest("Radar" ,deviceInfoEntity)
+//        }
+//        if (deviceInfoEntity.isAirBind) {
+//            mainRepository.deviceUnBindingRequest( "Air" ,deviceInfoEntity)
+//        }
+//    }
 
     fun logout()= mainRepository.logout()
 
+    suspend fun logoutServer() = withContext(Dispatchers.IO){ mainRepository.logoutServer() }
 
     //webSocket
     var appContext : MutableLiveData<Context> = MutableLiveData(null)
@@ -158,9 +161,11 @@ class MainViewModel(
 
     fun getDeviceAccountId() = radarRepository.getDeviceAccountId()
 
-    fun isChange(change: Boolean) {
-        isDeviceChange.value = change
-    }
+    fun getDeviceBind() = radarRepository.getDeviceBind()
+
+//    fun isChange(change: Boolean) {
+//        isDeviceChange.value = change
+//    }
 
     fun startSocket(context: Context, accountId: Int): Channel<SocketUpdate> =
         webServices.startSocket( context,accountId)
@@ -176,4 +181,9 @@ class MainViewModel(
 
     fun isHasTemperature() = radarRepository.isHasTemperature()
 
+    //server取得裝置資料儲存
+    fun saveAccountDeviceInfo(data: CheckDeviceResponse) = mainRepository.saveAccountDeviceInfo(data)
+
+    //token失效登出
+    val tokenFailLogout = MutableLiveData(false)
 }

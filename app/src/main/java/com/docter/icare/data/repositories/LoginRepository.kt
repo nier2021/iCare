@@ -5,7 +5,8 @@ import com.docter.icare.R
 import com.docter.icare.data.entities.view.LoginEntity
 import com.docter.icare.data.network.SafeApiRequest
 import com.docter.icare.data.network.api.ApiService
-import com.docter.icare.data.network.api.response.LoginResponse2
+import com.docter.icare.data.network.api.getToken
+import com.docter.icare.data.network.api.response.LoginResponse
 import com.docter.icare.data.preferences.PreferenceProvider
 import com.docter.icare.data.resource.*
 import com.docter.icare.utils.InputException
@@ -36,18 +37,19 @@ class LoginRepository (
 
     suspend fun login(
         entity: LoginEntity
-    ):LoginResponse2 = apiRequest { api.login(entity.account, entity.password) }.let {
-        if (it.success == 1) return it else throw Exception(it.message)
-    }
+    ): LoginResponse = apiRequest { api.login(entity.account, entity.password) }
 
-    fun save(entity: LoginEntity,data: LoginResponse2){
-        if (data.sid.isNotBlank()) {
-//            Log.i("LoginRepository","account=>${entity.account} \n sid=>${data.sid} \n name=>${data.name}")
+    fun save(entity: LoginEntity,data: LoginResponse){
+        if (data.user.account.isNotBlank() && data.token.isNotBlank()) {
+
+            val getToken: String = data.token.getToken()
+            Log.i("LoginRepository","account=>${entity.account} \n token=>${data.token} \n getToken=>$getToken \n accountId=>${data.user.accountId}")
             with(preference){
                 set(ACCOUNT, entity.account)
                 set(PASSWORD, entity.password)
-                set(SID, data.sid)
-                set(NAME, data.name)
+                set(ACCOUNT_ID, data.user.accountId)
+                set(TOKEN, getToken)
+                set(NAME, data.user.name)
             }
         }
     }
